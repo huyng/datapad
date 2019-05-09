@@ -442,17 +442,17 @@ class Sequence:
         """
         return list(self.all())
 
-    def shuffled(self):
+    def shuffle(self):
         """
         Eagerly shuffles your sequence and returns a
         newly created sequence containing the shuffled items.
-        WARNING: this function loads the entirety of your dataset
+        WARNING: this function loads the entirety of your sequence
         into memory.
 
         >>> import random
         >>> random.seed(0)
         >>> seq = Sequence.from_iterable(range(5))
-        >>> seq.shuffled().collect()
+        >>> seq.shuffle().collect()
         [2, 1, 0, 4, 3]
         """
         def _f(iterable):
