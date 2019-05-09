@@ -1,3 +1,137 @@
+def _from_glob_paths(path_or_paths):
+    """
+    Construct a Sequence from file glob patterns
+
+    Args:
+        path_or_paths: str or list of strings
+            A path, or list of paths. Paths may
+            contain glob patterns like "data/metadata-*-a.txt"
+
+    >>> seq = _from_glob_paths(["data/meta-*.txt"])
+    >>> list(seq.all()) # doctest: +SKIP
+    ["data/meta-1.json", "data/meta-2.json"]
+    """
+
+    if isinstance(path_or_paths, (tuple,list)):
+        paths = path_or_paths
+    else:
+        paths = [path_or_paths]
+
+    def _deglobify(path):
+        import glob
+        for p in glob.glob(path):
+            yield p
+
+    seq = Sequence.from_iterable(paths)
+    seq = seq.flatmap(_deglobify)
+    return seq
+
+def read_text(path_or_paths, lines=True):
+    """
+    Construct a Sequence from text files
+
+    Args:
+        path_or_paths: str or list of strings
+            A path, or list of paths. Paths may
+            contain glob patterns like "data/metadata-*-a.txt"
+        lines: bool
+            If True, each element of the sequence comes from reading a line
+            in the text file. If False, each element in sequence comes
+            from the entire text file (default: True).
+
+    >>> seq = read_text(["data/meta-*.txt"], lines=True)
+    >>> list(seq.all()) # doctest: +SKIP
+    ["foo_a", "foo_b", "bar_a", "bar_b"]
+
+    >>> seq = read_text(["data/meta-*.txt"], lines=False)
+    >>> list(seq.all()) # doctest: +SKIP
+    ["foo_a\\nfoo_b", "bar_a\\nbar_b"]
+    """
+
+    def _read(path):
+        with open(path) as fh:
+            # read each file as a sequence of lines
+            # otherwise read each file a single single string
+            if lines:
+                for line in fh:
+                    yield line
+            else:
+                yield fh.read()
+
+
+    seq = _from_glob_paths(path_or_paths)
+    seq = seq.flatmap(_read)
+    return seq
+
+
+def read_json(path_or_paths, lines=True, ignore_errors=False):
+    """
+    Construct a Sequence from json text files
+
+    Args:
+        path_or_paths: str or list of strings
+            A path, or list of paths. Paths may
+            contain glob patterns like "data/metadata-*-a.txt"
+        lines: bool
+            If True, each element of the sequence comes from decoding
+            a line in the json-lines text file (see: http://jsonlines.org/examples/).
+            If False, each element in sequence is obtained by running json.loads
+            on the entire contents of the text file (default: True).
+        ignore_errors: bool
+            If True, ignore and skip over any elements that present json load errors
+
+    >>> seq = read_json(["data/meta-*.json"], lines=True)
+    >>> list(seq.all()) # doctest: +SKIP
+    [{"dog": 1}, {"dog": 2}]
+    """
+    import json
+
+    seq = read_text(path_or_paths, lines=lines)
+    if ignore_errors:
+
+        def maybe_json_loads(s):
+            try:
+                return json.loads(s)
+            except json.JSONDecodeError:
+                return None
+
+        seq = seq.map(maybe_json_loads)
+        seq = seq.dropwhile(lambda v: v is None)
+
+    else:
+        seq = seq.map(json.loads)
+    return seq
+
+
+def read_csv(path_or_paths):
+    """
+    Construct a Sequence from json text files
+
+    Args:
+        path_or_paths: str or list of strings
+            A path, or list of paths. Paths may
+            contain glob patterns like "data/metadata-*-a.txt"
+
+    >>> seq = read_csv(["data/meta-*.csv"])
+    >>> list(seq.all()) # doctest: +SKIP
+    [["foo", "bar"],
+     ["1", "2"],
+     ["3", "4"]]
+    """
+
+    def _read(path):
+        import csv
+        with open(path, newline="") as fh:
+            dialect = csv.Sniffer().sniff(fh.read(1024))
+            fh.seek(0)
+            reader = csv.reader(fh, dialect)
+            for row in reader:
+                yield row
+
+    seq = _from_glob_paths(path_or_paths)
+    seq = seq.flatmap(_read)
+    return seq
+
 
 class Sequence:
 
@@ -216,145 +350,6 @@ class Sequence:
         [1, 2, 3]
         """
         seq = cls(_iterable=seq)
-        return seq
-
-    @classmethod
-    def _from_glob_paths(cls, path_or_paths):
-        """
-        Construct a Sequence from file glob patterns
-
-        Args:
-            path_or_paths: str or list of strings
-                A path, or list of paths. Paths may
-                contain glob patterns like "data/metadata-*-a.txt"
-
-        >>> seq = Sequence._from_glob_paths(["data/meta-*.txt"])
-        >>> list(seq.all()) # doctest: +SKIP
-        ["data/meta-1.json", "data/meta-2.json"]
-        """
-
-        if isinstance(path_or_paths, (tuple,list)):
-            paths = path_or_paths
-        else:
-            paths = [path_or_paths]
-
-        def _deglobify(path):
-            import glob
-            for p in glob.glob(path):
-                yield p
-
-        seq = cls.from_iterable(paths)
-        seq = seq.flatmap(_deglobify)
-        return seq
-
-    @classmethod
-    def read_text(cls, path_or_paths, lines=True):
-        """
-        Construct a Sequence from text files
-
-        Args:
-            path_or_paths: str or list of strings
-                A path, or list of paths. Paths may
-                contain glob patterns like "data/metadata-*-a.txt"
-            lines: bool
-                If True, each element of the sequence comes from reading a line
-                in the text file. If False, each element in sequence comes
-                from the entire text file (default: True).
-
-        >>> seq = Sequence.read_text(["data/meta-*.txt"], lines=True)
-        >>> list(seq.all()) # doctest: +SKIP
-        ["foo_a", "foo_b", "bar_a", "bar_b"]
-
-        >>> seq = Sequence.read_text(["data/meta-*.txt"], lines=False)
-        >>> list(seq.all()) # doctest: +SKIP
-        ["foo_a\\nfoo_b", "bar_a\\nbar_b"]
-        """
-
-        def _read(path):
-            with open(path) as fh:
-                # read each file as a sequence of lines
-                # otherwise read each file a single single string
-                if lines:
-                    for line in fh:
-                        yield line
-                else:
-                    yield fh.read()
-
-
-        seq = cls._from_glob_paths(path_or_paths)
-        seq = seq.flatmap(_read)
-        return seq
-
-
-    @classmethod
-    def read_json(cls, path_or_paths, lines=True, ignore_errors=False):
-        """
-        Construct a Sequence from json text files
-
-        Args:
-            path_or_paths: str or list of strings
-                A path, or list of paths. Paths may
-                contain glob patterns like "data/metadata-*-a.txt"
-            lines: bool
-                If True, each element of the sequence comes from decoding
-                a line in the json-lines text file (see: http://jsonlines.org/examples/).
-                If False, each element in sequence is obtained by running json.loads
-                on the entire contents of the text file (default: True).
-            ignore_errors: bool
-                If True, ignore and skip over any elements that present json load errors
-
-        >>> seq = Sequence.read_text(["data/meta-*.txt"], lines=True)
-        >>> list(seq.all()) # doctest: +SKIP
-        [{"dog": 1}, {"dog": 2}]
-        """
-
-
-
-        seq = cls.read_text(path_or_paths, lines=lines)
-        if ignore_errors:
-
-            def maybe_json_loads(s):
-                try:
-                    return json.loads(s)
-                except json.JSONDecodeError:
-                    return None
-
-            seq = seq.map(maybe_json_loads)
-            seq = seq.dropwhile(lambda v: v is None)
-            
-        else:
-            seq = seq.map(json.loads)
-        return seq
-
-
-    @classmethod
-    def read_csv(cls, path_or_paths):
-        """
-        Construct a Sequence from json text files
-
-        Args:
-            path_or_paths: str or list of strings
-                A path, or list of paths. Paths may
-                contain glob patterns like "data/metadata-*-a.txt"
-
-        >>> seq = Sequence.read_csv(["data/meta-*.csv"])
-        >>> list(seq.all()) # doctest: +SKIP
-        [["foo", "bar"],
-         ["1", "2"],
-         ["3", "4"]]
-        """
-
-        def _read(path):
-            import csv
-            with open(path, newline="") as fh:
-                dialect = csv.Sniffer().sniff(fh.read(1024))
-                fh.seek(0)
-                reader = csv.reader(fh, dialect)
-                for row in reader:
-                    yield row
-
-        seq = cls._from_glob_paths(path_or_paths)
-        seq = seq.flatmap(_read)
         return seq
 
 
