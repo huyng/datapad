@@ -10,7 +10,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='datapad',
-      version='0.4',
+      version='0.5',
       description='Datapad is a library of lazy data transformations for sequences; similar to spark and linq',
       long_description=long_description,
       long_description_content_type='text/markdown',
@@ -18,4 +18,4 @@ setup(name='datapad',
       author_email='',
       url='https://github.com/huyng/datapad',
       packages=['datapad'],
-     )
+      )
