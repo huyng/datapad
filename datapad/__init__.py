@@ -1,5 +1,6 @@
 # Copyright Huy Nguyen 2019
 
+
 def _from_glob_paths(path_or_paths):
     """
     Construct a Sequence from file glob patterns
@@ -10,11 +11,11 @@ def _from_glob_paths(path_or_paths):
             contain glob patterns like "data/metadata-*-a.txt"
 
     >>> seq = _from_glob_paths(["data/meta-*.txt"])
-    >>> list(seq.all()) # doctest: +SKIP
+    >>> seq.collect() # doctest: +SKIP
     ["data/meta-1.json", "data/meta-2.json"]
     """
 
-    if isinstance(path_or_paths, (tuple,list)):
+    if isinstance(path_or_paths, (tuple, list)):
         paths = path_or_paths
     else:
         paths = [path_or_paths]
@@ -28,6 +29,7 @@ def _from_glob_paths(path_or_paths):
     seq = seq.flatmap(_deglobify)
     return seq
 
+
 def read_text(path_or_paths, lines=True):
     """
     Construct a Sequence from text files
@@ -36,17 +38,17 @@ def read_text(path_or_paths, lines=True):
         path_or_paths: str or list of strings
             A path, or list of paths. Paths may
             contain glob patterns like "data/metadata-*-a.txt"
-        lines: bool
+        lines: bool (default: True)
             If True, each element of the sequence comes from reading a line
             in the text file. If False, each element in sequence comes
-            from the entire text file (default: True).
+            from the entire text file.
 
     >>> seq = read_text(["data/meta-*.txt"], lines=True)
-    >>> list(seq.all()) # doctest: +SKIP
+    >>> seq.collect() # doctest: +SKIP
     ["foo_a", "foo_b", "bar_a", "bar_b"]
 
     >>> seq = read_text(["data/meta-*.txt"], lines=False)
-    >>> list(seq.all()) # doctest: +SKIP
+    >>> seq.collect() # doctest: +SKIP
     ["foo_a\\nfoo_b", "bar_a\\nbar_b"]
     """
 
@@ -59,7 +61,6 @@ def read_text(path_or_paths, lines=True):
                     yield line
             else:
                 yield fh.read()
-
 
     seq = _from_glob_paths(path_or_paths)
     seq = seq.flatmap(_read)
@@ -74,16 +75,16 @@ def read_json(path_or_paths, lines=True, ignore_errors=False):
         path_or_paths: str or list of strings
             A path, or list of paths. Paths may
             contain glob patterns like "data/metadata-*-a.txt"
-        lines: bool
+        lines: bool (default: True)
             If True, each element of the sequence comes from decoding
             a line in the json-lines text file (see: http://jsonlines.org/examples/).
             If False, each element in sequence is obtained by running json.loads
-            on the entire contents of the text file (default: True).
+            on the entire contents of the text file .
         ignore_errors: bool
             If True, ignore and skip over any elements that present json load errors
 
     >>> seq = read_json(["data/meta-*.json"], lines=True)
-    >>> list(seq.all()) # doctest: +SKIP
+    >>> seq.collect() # doctest: +SKIP
     [{"dog": 1}, {"dog": 2}]
     """
     import json
@@ -98,7 +99,7 @@ def read_json(path_or_paths, lines=True, ignore_errors=False):
                 return None
 
         seq = seq.map(maybe_json_loads)
-        seq = seq.dropwhile(lambda v: v is None)
+        seq = seq.drop_if(lambda v: v is None)
 
     else:
         seq = seq.map(json.loads)
@@ -115,7 +116,7 @@ def read_csv(path_or_paths):
             contain glob patterns like "data/metadata-*-a.txt"
 
     >>> seq = read_csv(["data/meta-*.csv"])
-    >>> list(seq.all()) # doctest: +SKIP
+    >>> seq.collect() # doctest: +SKIP
     [["foo", "bar"],
      ["1", "2"],
      ["3", "4"]]
@@ -138,7 +139,15 @@ def read_csv(path_or_paths):
 class Sequence:
 
     def __init__(self, _iterable=None):
-        self._iterable = _iterable if _iterable else []
+        from collections.abc import Iterator
+
+        _iterable = iter([]) if _iterable is None else _iterable
+
+        # convert all iterables to iterator
+        if not isinstance(_iterable, Iterator):
+            _iterable = iter(_iterable)
+
+        self._iterable = _iterable
 
     def map(self, fn):
         """
@@ -152,7 +161,7 @@ class Sequence:
 
         >>> seq = Sequence.from_iterable(range(10))
         >>> seq = seq.map(lambda v: v*2)
-        >>> list(seq.all())
+        >>> seq.collect()
         [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
         """
         def _f(seq):
@@ -162,28 +171,76 @@ class Sequence:
         seq = Sequence(_iterable=_f(self._iterable))
         return seq
 
-    def pmap_unordered(self, fn, workers=10):
+    def reduce(self, fn, initial=None):
         """
-        Lazily apply fn function to every element of iterable, in parallel.
-        The returned sequence may appear in a different order than the input
-        sequence
+        Eagerly apply a function of two arguments cumulatively to the items of a sequence,
+        from left to right, so as to reduce the sequence to a single value.
+        For example, reduce(lambda x, y: x+y, [1, 2, 3, 4, 5]) calculates
+        ((((1+2)+3)+4)+5).  If initial is present, it is placed before the items
+        of the sequence in the calculation, and serves as a default when the
+        sequence is empty.
+
+        Args:
+            fn: function
+                Function with signature fn(acc, current_item) -> acc_next
+            initial: Any
+                An initial value that acc will be set to. If not provided,
+                this function will set the first element of the sequence as
+                the initial value.
+
+        >>> seq = Sequence.from_iterable(range(10))
+        >>> seq.reduce(lambda acc, item: acc + item, initial=0)
+        45
+        """
+
+        # if user provided initial value
+        # use it as the first element passed to the reduce fn
+        # otherwise use the first element of the iterable
+        if initial is None:
+            acc = next(iterable)
+        else:
+            acc = initial
+
+        for item in self._iterable:
+            acc = fn(acc, item)
+
+        return acc
+
+    def pmap(self, fn, workers=3, ordered=True):
+        """
+        Lazily apply fn function to every element of iterable, in parallel using
+        multiprocess.dummy.Pool . The returned sequence may appear in a
+        different order than the input sequence if you set `ordered` to False
+
+        THIS FUNCTION IS EXPERIMENTAL
 
         Args:
             fn: function
                 Function with signature fn(element) -> element to apply to every
                 element of sequence.
-            workers: int
-                Number of parallel processes to use (default: 10)
+            workers: int (default: 3)
+                Number of parallel workers to use. These
+                workers are implemented as python threads.
+            ordered: bool (default: True)
+                Whether to yield results in the same order in which items
+                arrive. You may get better performance by setting this to false.
 
         >>> seq = Sequence.from_iterable(range(10))
-        >>> seq = seq.map(lambda v: v*2)
-        >>> list(seq.all()) # doctest: +SKIP
-        [0, 2, 4, 6, 8, 10, 12, 14, 16, 180]
+        >>> seq = seq.pmap(lambda v: v*2)
+        >>> seq.collect()
+        [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+
+        >>> seq = Sequence.from_iterable(range(10))
+        >>> seq = seq.pmap(lambda v: v*2, workers=1, ordered=False)
+        >>> seq.collect()
+        [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
         """
         from multiprocessing.dummy import Pool as ThreadPool
         pool = ThreadPool(workers)
+        apply = pool.imap_unordered if not ordered else pool.imap
+
         def _f(seq):
-            for result in pool.imap_unordered(fn, seq):
+            for result in apply(fn, seq):
                 yield result
 
         seq = Sequence(_iterable=_f(self._iterable))
@@ -202,7 +259,7 @@ class Sequence:
 
         >>> seq = Sequence.from_iterable(range(5))
         >>> seq = seq.flatmap(lambda v: [v,v])
-        >>> list(seq.all())
+        >>> seq.collect()
         [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]
         """
         def _f(seq):
@@ -214,6 +271,17 @@ class Sequence:
 
     def filter(self, fn):
         """
+        This is an alias for the Sequence.keep_if function
+
+        >>> seq = Sequence.from_iterable(range(5))
+        >>> seq = seq.filter(lambda v: v > 1)
+        >>> seq.collect()
+        [2, 3, 4]
+        """
+        return self.keep_if(fn)
+
+    def keep_if(self, fn):
+        """
         Lazily apply fn function to every element of iterable and keep only
         sequence elements where the function fn evaluates to True.
 
@@ -224,8 +292,8 @@ class Sequence:
                 fn function evaluates to True.
 
         >>> seq = Sequence.from_iterable(range(5))
-        >>> seq = seq.filter(lambda v: v > 1)
-        >>> list(seq.all())
+        >>> seq = seq.keep_if(lambda v: v > 1)
+        >>> seq.collect()
         [2, 3, 4]
         """
 
@@ -237,7 +305,7 @@ class Sequence:
         seq = Sequence(_iterable=_f(self._iterable))
         return seq
 
-    def dropwhile(self, fn):
+    def drop_if(self, fn):
         """
         Lazily apply fn function to every element of iterable and drop
         sequence elements where the function fn evaluates to True.
@@ -249,8 +317,8 @@ class Sequence:
                 fn function evaluates to True.
 
         >>> seq = Sequence.from_iterable(range(5))
-        >>> seq = seq.dropwhile(lambda v: v > 1)
-        >>> list(seq.all())
+        >>> seq = seq.drop_if(lambda v: v > 1)
+        >>> seq.collect()
         [0, 1]
         """
         return self.filter(lambda v: not fn(v))
@@ -265,18 +333,30 @@ class Sequence:
         """
         for i, _ in enumerate(self._iterable):
             pass
-        return i+1
+        return i + 1
+
+    def zip_with_index(self):
+        """
+        Add an to each item in sequence
+
+        >>> seq = Sequence.from_iterable(['a', 'b', 'c'])
+        >>> seq.zip_with_index().collect()
+        [(0, 'a'), (1, 'b'), (2, 'c')]
+        """
+        seq = Sequence(_iterable=enumerate(self._iterable))
+        return seq
 
     def drop(self, count):
         """
         Lazily skip or drop over `count` elements.
 
         >>> seq = Sequence.from_iterable(range(5))
-        >>> list(seq.all())
+        >>> seq.collect()
         [0, 1, 2, 3, 4]
 
+        >>> seq = Sequence.from_iterable(range(5))
         >>> seq = seq.drop(2)
-        >>> list(seq.all())
+        >>> seq.collect()
         [2, 3, 4]
         """
         def _f(seq):
@@ -289,20 +369,20 @@ class Sequence:
 
     def take(self, count):
         """
-        Eagerly returns list of the first `count` elements.
+        Lazily returns a sequence of the first `count` elements.
 
         >>> seq = Sequence.from_iterable(range(5))
-        >>> seq.take(2)
+        >>> seq.take(2).collect()
         [0, 1]
         """
+        def _f(seq):
+            for i, item in enumerate(seq):
+                yield item
+                if (i + 1) >= count:
+                    break
 
-        seq = self._iterable
-        items = []
-        for i, item in enumerate(seq):
-            items.append(item)
-            if (i+1) >= count:
-                break
-        return items
+        seq = Sequence(_iterable=_f(self._iterable))
+        return seq
 
     def first(self):
         """
@@ -312,8 +392,10 @@ class Sequence:
         >>> seq.first()
         0
         """
-
-        return self.take(1)[0]
+        items = self.take(1).collect()
+        if len(items) == 0:
+            return None
+        return items[0]
 
     def concat(self, seq):
         """
@@ -322,7 +404,7 @@ class Sequence:
 
         >>> seq = Sequence.from_iterable(range(5))
         >>> seq =seq.concat(seq)
-        >>> list(seq.all())
+        >>> seq.collect()
         [0, 1, 2, 3, 4, 0, 1, 2, 3, 4]
         """
 
@@ -337,23 +419,41 @@ class Sequence:
 
     def all(self):
         """
-        Lazily returns all elements in sequence
+        Returns a standard python iterator that you can
+        use to lazily iterate over your sequence of data
+
+        >>> seq = Sequence.from_iterable(range(10))
+        >>> seq = seq.map(lambda v: v*2)
+        >>> i = 0
+        >>> for item in seq.all():
+        ...     i += item
+        >>> i
+        90
         """
         return self._iterable
 
+    def collect(self):
+        """
+        Eagerly returns all elements in sequence
+
+        >>> seq = Sequence.from_iterable(range(10))
+        >>> seq.collect()
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        """
+        return list(self.all())
+
     @classmethod
-    def from_iterable(cls, seq):
+    def from_iterable(cls, iterable):
         """
         Construct a Sequence from any data type that follows
         the iterator API.
 
         >>> seq = Sequence.from_iterable([1,2,3])
-        >>> list(seq.all())
+        >>> seq.collect()
         [1, 2, 3]
         """
-        seq = cls(_iterable=seq)
+        seq = cls(_iterable=iterable)
         return seq
-
 
 
 if __name__ == "__main__":
