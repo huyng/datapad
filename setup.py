@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# Copyright Huy Nguyen 2019
 
 from setuptools import setup
 

@@ -1,3 +1,5 @@
+# Copyright Huy Nguyen 2019
+
 def _from_glob_paths(path_or_paths):
     """
     Construct a Sequence from file glob patterns
