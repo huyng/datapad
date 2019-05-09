@@ -442,6 +442,28 @@ class Sequence:
         """
         return list(self.all())
 
+    def shuffled(self):
+        """
+        Eagerly shuffles your sequence and returns a
+        newly created sequence containing the shuffled items.
+        WARNING: this function loads the entirety of your dataset
+        into memory.
+
+        >>> import random
+        >>> random.seed(0)
+        >>> seq = Sequence.from_iterable(range(5))
+        >>> seq.shuffled().collect()
+        [2, 1, 0, 4, 3]
+        """
+        def _f(iterable):
+            import random
+            items = list(iterable)
+            random.shuffle(items)
+            return items
+        seq = Sequence(_iterable=_f(self._iterable))
+        return seq
+
+
     @classmethod
     def from_iterable(cls, iterable):
         """
