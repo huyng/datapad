@@ -84,3 +84,29 @@ list(seq.all())
 ```
 [2, 3, 4]
 ```
+
+sort:
+```
+seq = Sequence.from_iterable([2, 1, 0, 4, 3])
+seq.sort().collect()
+```
+
+```
+[0, 1, 2, 3, 4]
+```
+
+
+groupby:
+
+```
+things = [("animal", "lion"), ("plant", "maple tree"), ("animal", "walrus"), ("plant", "grass")]
+seq = Sequence.from_iterable(things)
+groups = seq.sort().groupby(key=lambda x: x[0], getter=lambda x: x[1])
+for key, group in groups:
+   print(key, group.collect())
+```
+
+```
+animal ['lion', 'walrus']
+plant ['grass', 'maple tree']
+```

@@ -21,6 +21,7 @@ def _from_glob_paths(path_or_paths):
         paths = [path_or_paths]
 
     def _deglobify(path):
+        # todo make sure we only deglobify if path is glob
         import glob
         for p in glob.glob(path):
             yield p
@@ -432,6 +433,20 @@ class Sequence:
         """
         return self._iterable
 
+    def __iter__(self):
+        """
+        >>> seq = Sequence.from_iterable(range(10))
+        >>> seq = seq.map(lambda v: v*2)
+        >>> i = 0
+        >>> for item in seq:
+        ...     i += item
+        >>> i
+        90
+        """
+
+        return self.all()
+
+
     def collect(self):
         """
         Eagerly returns all elements in sequence
@@ -441,6 +456,50 @@ class Sequence:
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         """
         return list(self.all())
+
+
+    def sort(self, key=None):
+        """
+        Eagerly sorts your sequence and returns a
+        newly created sequence containing the sorted items.
+        WARNING: this function loads the entirety of your sequence
+        into memory.
+
+        >>> seq = Sequence.from_iterable([2, 1, 0, 4, 3])
+        >>> seq.sort().collect()
+        [0, 1, 2, 3, 4]
+        """
+        seq = Sequence(_iterable=sorted(list(self._iterable), key=key))
+        return seq
+
+
+    def groupby(self, key=None, getter=None):
+        """
+        Lazily groups sequence using key function
+
+        >>> things = [("animal", "lion"), ("plant", "maple tree"), ("animal", "walrus"), ("plant", "grass")]
+        >>> seq = Sequence.from_iterable(things)
+        >>> groups = seq.sort().groupby(key=lambda x: x[0], getter=lambda x: x[1])
+        >>> for key, group in groups:
+        ...     print(key, group.collect())
+        animal ['lion', 'walrus']
+        plant ['grass', 'maple tree']
+        """
+        if getter is None:
+            getter = lambda x: x
+
+        def _f(iterable, key, getter):
+            import itertools as it
+            groups = it.groupby(iterable, key=key)
+
+            for key, group in groups:
+                group = (getter(element) for element in group)
+                yield key, Sequence(_iterable=group)
+
+        seq = Sequence(_iterable=_f(self._iterable, key, getter))
+        return seq
+
+
 
     def shuffle(self):
         """
