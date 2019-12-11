@@ -1,3 +1,5 @@
+# Copyright(C) 2019 Huy Nguyen - All Rights Reserved
+
 class Sequence:
 
     def __init__(self, _iterable=None):
@@ -59,7 +61,7 @@ class Sequence:
         # use it as the first element passed to the reduce fn
         # otherwise use the first element of the iterable
         if initial is None:
-            acc = next(iterable)
+            acc = next(self._iterable)
         else:
             acc = initial
 
@@ -307,7 +309,6 @@ class Sequence:
 
         return self.all()
 
-
     def collect(self):
         """
         Eagerly returns all elements in sequence
@@ -317,7 +318,6 @@ class Sequence:
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         """
         return list(self.all())
-
 
     def sort(self, key=None):
         """
@@ -333,21 +333,36 @@ class Sequence:
         seq = Sequence(_iterable=sorted(list(self._iterable), key=key))
         return seq
 
-
-    def groupby(self, key=None, getter=None):
+    def groupby(self, key=None, getter=None, eager_group=True):
         """
-        Lazily groups sequence using key function
+        Groups sequence using key function,
+
+        Note: you must ensure elements are sorted by groups before
+        calling this function.
+
+        Args:
+            key: function
+                Function used to determine what to use as a key for grouping
+
+            getter: function
+                Function to be applied to each element of a group
+
+            eager_group: bool, default=True
+                If true, eagerly convert a group from a lazy sequence to
+                a fully realized list.
+
 
         >>> things = [("animal", "lion"), ("plant", "maple tree"), ("animal", "walrus"), ("plant", "grass")]
         >>> seq = Sequence.from_iterable(things)
         >>> groups = seq.sort().groupby(key=lambda x: x[0], getter=lambda x: x[1])
         >>> for key, group in groups:
-        ...     print(key, group.collect())
+        ...     print(key, group)
         animal ['lion', 'walrus']
         plant ['grass', 'maple tree']
         """
         if getter is None:
-            getter = lambda x: x
+            def getter(x):
+                return x
 
         def _f(iterable, key, getter):
             import itertools as it
@@ -355,12 +370,15 @@ class Sequence:
 
             for key, group in groups:
                 group = (getter(element) for element in group)
-                yield key, Sequence(_iterable=group)
+                group_seq = Sequence(_iterable=group)
+
+                if eager_group:
+                    group_seq = group_seq.collect()
+
+                yield key, group_seq
 
         seq = Sequence(_iterable=_f(self._iterable, key, getter))
         return seq
-
-
 
     def shuffle(self):
         """
@@ -383,7 +401,6 @@ class Sequence:
         seq = Sequence(_iterable=_f(self._iterable))
         return seq
 
-
     @classmethod
     def from_iterable(cls, iterable):
         """
@@ -396,6 +413,7 @@ class Sequence:
         """
         seq = cls(_iterable=iterable)
         return seq
+
 
 if __name__ == "__main__":
     import doctest

@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-# Copyright Huy Nguyen 2019
+
+# Copyright(C) 2019 Huy Nguyen - All Rights Reserved
+
 import os
 os.environ['NOSE_DOCTEST_EXTENSION'] = 'txt'
 os.environ['NOSE_WITH_DOCTEST'] = 'True'
@@ -15,7 +17,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='datapad',
-    version='0.5.3',
+    version='0.6.0',
     description='Datapad is a library of lazy data transformations for sequences; similar to spark and linq',
     long_description=long_description,
     long_description_content_type='text/markdown',

@@ -1,3 +1,5 @@
+# Copyright(C) 2019 Huy Nguyen - All Rights Reserved
+
 from .sequence import Sequence
 
 def _from_glob_paths(path_or_paths):
