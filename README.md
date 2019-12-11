@@ -1,5 +1,19 @@
 # datapad
 
+Datapad is library for operating on sequences of data using a [fluent API](https://en.wikipedia.org/wiki/Fluent_interface#Python).
+Think of it as an extended and chainable version of Python's `itertools` library. 
+
+This project incorporates ideas from:
+
+* [LINQ](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/standard-query-operators-overview)
+* [Spark](https://spark.apache.org/)
+* [Python Itertools](https://docs.python.org/3/library/itertools.html)
+* [Pandas](https://pandas.pydata.org/)
+* [Dask](https://dask.org/)
+* [Tensorflow tf.data.Datasets](https://www.tensorflow.org/api_docs/python/tf/data/Dataset)
+
+
+
 ### install
 
 ```
@@ -20,7 +34,7 @@ map:
 ```
 seq = Sequence(range(10))
 seq = seq.map(lambda v: v*2)
-list(seq.all())
+seq.collect()
 ```
 ```
 [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
@@ -30,7 +44,7 @@ filter:
 ```
 seq = Sequence(range(5))
 seq = seq.filter(lambda v: v > 1)
-list(seq.all())
+seq.collect()
 ```
 
 ```
@@ -40,7 +54,7 @@ pmap_unordered:
 ```
 seq = Sequence(range(10))
 seq = seq.map(lambda v: v*2)
-list(seq.all()) # doctest: +SKIP
+seq.collect()
 ```
 ```
 [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
@@ -50,7 +64,7 @@ flatmap:
 ```
 seq = Sequence(range(5))
 seq = seq.flatmap(lambda v: [v,v])
-list(seq.all())
+seq.collect()
 ```
 ```
 [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]
@@ -60,7 +74,7 @@ dropwhile:
 ```
 seq = Sequence(range(5))
 seq = seq.dropwhile(lambda v: v > 1)
-list(seq.all())
+seq.collect()
 ```
 ```
 [0, 1]
@@ -79,7 +93,7 @@ drop:
 ```
 seq = Sequence(range(5))
 seq = seq.drop(2)
-list(seq.all())
+seq.collect()
 ```
 ```
 [2, 3, 4]
