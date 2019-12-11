@@ -6,7 +6,7 @@
 pip install datapad
 ```
 
-### usage
+#### Basic usage
 
 create a sequence
 
@@ -112,7 +112,7 @@ plant ['grass', 'maple tree']
 ```
 
 
-# Operating on fields within a row of a Sequence
+#### Operating on fields within a row of a Sequence
 
 Suppose we have the following sequence
 
