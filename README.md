@@ -112,7 +112,7 @@ plant ['grass', 'maple tree']
 ```
 
 
-# Operating on fields or columns within a row of a Sequence
+# Operating on fields within a row of a Sequence
 
 Suppose we have the following sequence
 
