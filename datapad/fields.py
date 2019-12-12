@@ -8,9 +8,18 @@ def asdict(keys=None):
     by `keys`. If `keys` is None, then use
     indices of list for keys.
 
-    >>> data = [1, 2, 3]
-    >>> asdict(['a', 'b', 'c'])(data)
-    {'a': 1, 'b': 2, 'c': 3}
+    Convert list to dict using pre-defined keys:
+
+        >>> data = [1, 2, 3]
+        >>> asdict(['a', 'b', 'c'])(data)
+        {'a': 1, 'b': 2, 'c': 3}
+
+    Convert list to dict using list indices as keys:
+
+        >>> data = [1, 2, 3]
+        >>> asdict()(data)
+        {0: 1, 1: 2, 2: 3}
+
 
     '''
 
