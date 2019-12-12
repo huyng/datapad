@@ -1,5 +1,6 @@
 # Copyright(C) 2019 Huy Nguyen - All Rights Reserved
 
+
 def asdict(keys=None):
     '''
     Returns a function that will convert
@@ -62,17 +63,26 @@ def select(keys):
     return _function
 
 
-def apply(funcs):
+def apply(*args):
     '''
-    Returns a function of the form
+    Returns a function which transforms each element of `data` using the
+    functions specified by `func` or `funcs`, in the following
+    call signatures.
 
-        f(data: list) -> list
-        f(data: dict) -> dict
-
-    which transforms each element of `data` using the
-    functions specified in `funcs`.
+    Possible Call Signatures:
+        apply(func:Function)
+        apply(key:Hashable, func:Function)
+        apply(funcs:List[func:Function])
+        apply(funcs:Dict[key:Hashable, func:Function])
 
     Args:
+        key:
+            A string, int, or other hashable value to be used to look up
+            the value to apply the transform to.
+        func:
+            Function of the form f(element: Any) -> Any to compute the value
+            of the newly added element.
+
         funcs: function, list, or dict
             Functions must be of the form f(element: Any) -> Any.
             - If funcs is a single function, apply funcs to all elements in data.
@@ -82,12 +92,24 @@ def apply(funcs):
               return the data[key] untransformed.
             - Ignore any functions in funcs that don't have keys in data.
 
-    Apply single function:
+    Apply single function to all fields:
 
         >>> data = [1, 2, 3]
         >>> f = apply(lambda x: x * 2)
         >>> f(data)
         [2, 4, 6]
+
+    Apply single function to a single field:
+
+        >>> data = [1, 2, 3]
+        >>> f = apply(1, lambda x: x * 2)
+        >>> f(data)
+        [1, 4, 3]
+
+        >>> data = {'a': 1, 'b': 2, 'c': 3}
+        >>> f = apply('a', lambda x: x * 2)
+        >>> f(data)
+        {'a': 2, 'b': 2, 'c': 3}
 
     Apply a dict of functions:
 
@@ -110,6 +132,24 @@ def apply(funcs):
 
 
     '''
+
+    if len(args) == 1:
+        # if user passes in apply({'a': lambda d: 1})
+        # or apply([lambda d: 1])
+        if isinstance(args[0], (dict, list, tuple)):
+            funcs = args[0]
+
+        # if user passes in add(lambda d: 1)
+        else:
+            funcs = args[0]
+
+    # if user passes in add('c', lambda d: 1)
+    elif len(args) == 2:
+        key = args[0]
+        func = args[1]
+        funcs = {key: func}
+    else:
+        raise ValueError('Please call add with one of the following signtures: (Function), (Str, Function), (List[Function]), or (Dict[Str, Function])')
 
     # convert funcs to a dict if passed in as a list
     if isinstance(funcs, list):
@@ -145,22 +185,47 @@ def apply(funcs):
     return _function
 
 
-def add(funcs):
+def add(*args):
     '''
-    Returns a function that given a dict or list as `data` will add new keys
+    Returns a function that when given a dict or list as `data` will add new keys
     or append new elements which are computed by applying functions
     in `funcs` to `data`.
 
+    Possible Call Signatures:
+        add(func:Function)
+        add(key:Hashable, func:Function)
+        add(funcs:List[func:Function])
+        add(funcs:Dict[key:Hashable, func:Function])
+
     Args:
-        funcs: list or dict
-            Functions must take the form f(data: [list, dict]) -> Any
+        key:
+            A string, int, or other hashable value to be used as the name of the
+            added field.
+        func:
+            Function of the form f(data:(List|Dict)) to compute the value
+            of the newly added element.
+
+
+    Add a single new element to end of list
+
+        >>> data = [1, 2, 3]
+        >>> f = add(lambda d: d[0]* d[1] * d[2])
+        >>> f(data)
+        [1, 2, 3, 6]
+
+    Add a single new dictionary key and value:
+
+        >>> data = {'a': 1, 'b': 2}
+        >>> f = add('c', lambda d: d['a'] + d['b'])
+        >>> f(data)
+        {'a': 1, 'b': 2, 'c': 3}
 
     Add new dictionary keys:
 
         >>> data = {'a': 1, 'b': 2}
-        >>> f = add({ 'c': (lambda d: d['a'] + d['b']) })
+        >>> f = add({ 'c': (lambda d: d['a'] + d['b']), 'd': lambda d: 10})
         >>> f(data)
-        {'a': 1, 'b': 2, 'c': 3}
+        {'a': 1, 'b': 2, 'c': 3, 'd': 10}
 
     Append new list elements:
 
@@ -170,6 +235,24 @@ def add(funcs):
         ['foo', 'bar', 'barfoo']
 
     '''
+
+    if len(args) == 1:
+        # if user passes in add({'a': lambda d: 1})
+        # or add([lambda d: 1])
+        if isinstance(args[0], (dict, list, tuple)):
+            funcs = args[0]
+
+        # if user passes in add(lambda d: 1)
+        else:
+            funcs = [args[0]]
+
+    # if user passes in add('c', lambda d: 1)
+    elif len(args) == 2:
+        key = args[0]
+        func = args[1]
+        funcs = {key: func}
+    else:
+        raise ValueError('Please call add with one of the following signtures: (Function), (Str, Function), (List[Function]), or (Dict[Str, Function])')
 
     def _function(data):
         if isinstance(data, list):
