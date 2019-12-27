@@ -209,7 +209,7 @@ class Sequence:
         5
 
         >>> seq = Sequence(['a', 'a', 'b', 'b', 'c', 'c'])
-        >>> seq.count(unique=True).collect()
+        >>> seq.count(distinct=True).collect()
         [('a', 2), ('b', 2), ('c', 2)]
 
         """
