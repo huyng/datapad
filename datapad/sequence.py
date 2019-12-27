@@ -1,4 +1,6 @@
 # Copyright(C) 2019 Huy Nguyen - All Rights Reserved
+import collections
+
 
 class Sequence:
 
@@ -23,7 +25,7 @@ class Sequence:
                 element of sequence.
 
 
-        >>> seq = Sequence.from_iterable(range(10))
+        >>> seq = Sequence(range(10))
         >>> seq = seq.map(lambda v: v*2)
         >>> seq.collect()
         [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
@@ -52,7 +54,7 @@ class Sequence:
                 this function will set the first element of the sequence as
                 the initial value.
 
-        >>> seq = Sequence.from_iterable(range(10))
+        >>> seq = Sequence(range(10))
         >>> seq.reduce(lambda acc, item: acc + item, initial=0)
         45
         """
@@ -89,12 +91,12 @@ class Sequence:
                 Whether to yield results in the same order in which items
                 arrive. You may get better performance by setting this to false.
 
-        >>> seq = Sequence.from_iterable(range(10))
+        >>> seq = Sequence(range(10))
         >>> seq = seq.pmap(lambda v: v*2)
         >>> seq.collect()
         [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
 
-        >>> seq = Sequence.from_iterable(range(10))
+        >>> seq = Sequence(range(10))
         >>> seq = seq.pmap(lambda v: v*2, workers=1, ordered=False)
         >>> seq.collect()
         [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
@@ -121,7 +123,7 @@ class Sequence:
                 element of sequence.
 
 
-        >>> seq = Sequence.from_iterable(range(5))
+        >>> seq = Sequence(range(5))
         >>> seq = seq.flatmap(lambda v: [v,v])
         >>> seq.collect()
         [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]
@@ -137,7 +139,7 @@ class Sequence:
         """
         This is an alias for the Sequence.keep_if function
 
-        >>> seq = Sequence.from_iterable(range(5))
+        >>> seq = Sequence(range(5))
         >>> seq = seq.filter(lambda v: v > 1)
         >>> seq.collect()
         [2, 3, 4]
@@ -155,7 +157,7 @@ class Sequence:
                 element of sequence. Keep all elements in the sequence where the
                 fn function evaluates to True.
 
-        >>> seq = Sequence.from_iterable(range(5))
+        >>> seq = Sequence(range(5))
         >>> seq = seq.keep_if(lambda v: v > 1)
         >>> seq.collect()
         [2, 3, 4]
@@ -180,30 +182,63 @@ class Sequence:
                 element of sequence. Drop all elements in the sequence where the
                 fn function evaluates to True.
 
-        >>> seq = Sequence.from_iterable(range(5))
+        >>> seq = Sequence(range(5))
         >>> seq = seq.drop_if(lambda v: v > 1)
         >>> seq.collect()
         [0, 1]
         """
         return self.filter(lambda v: not fn(v))
 
-    def count(self):
+    def count(self, distinct=False):
         """
         Eagerly count number of elements in sequence
 
-        >>> seq = Sequence.from_iterable(range(5))
+        Args:
+            distinct: bool
+                If True, counts occurence of each distinct
+                value in sequence.
+        Returns:
+            Either an integer count or a new sequence of
+            tuples where the first element is the unique value
+            and the second element is the number of times
+            that value appeared in the sequence.
+
+
+        >>> seq = Sequence(range(5))
         >>> seq.count()
         5
+
+        >>> seq = Sequence(['a', 'a', 'b', 'b', 'c', 'c'])
+        >>> seq.count(unique=True).collect()
+        [('a', 2), ('b', 2), ('c', 2)]
+
         """
-        for i, _ in enumerate(self._iterable):
-            pass
-        return i + 1
+
+        counter = collections.Counter()
+        for index, item in enumerate(self._iterable):
+            counter[item] += 1
+
+        if distinct:
+            return Sequence(_iterable=counter.items())
+        else:
+            return index + 1
+
+    def unique(self):
+        """
+        Eagerly returns a new sequence with unique values
+
+        >>> seq = Sequence(['a', 'a', 'b', 'b', 'c', 'c'])
+        >>> seq.unique().collect()
+        ['a', 'b', 'c']
+        """
+        odict = collections.OrderedDict.fromkeys(list(self))
+        return Sequence(_iterable=odict.keys())
 
     def zip_with_index(self):
         """
         Add an to each item in sequence
 
-        >>> seq = Sequence.from_iterable(['a', 'b', 'c'])
+        >>> seq = Sequence(['a', 'b', 'c'])
         >>> seq.zip_with_index().collect()
         [(0, 'a'), (1, 'b'), (2, 'c')]
         """
@@ -214,11 +249,11 @@ class Sequence:
         """
         Lazily skip or drop over `count` elements.
 
-        >>> seq = Sequence.from_iterable(range(5))
+        >>> seq = Sequence(range(5))
         >>> seq.collect()
         [0, 1, 2, 3, 4]
 
-        >>> seq = Sequence.from_iterable(range(5))
+        >>> seq = Sequence(range(5))
         >>> seq = seq.drop(2)
         >>> seq.collect()
         [2, 3, 4]
@@ -235,7 +270,7 @@ class Sequence:
         """
         Lazily returns a sequence of the first `count` elements.
 
-        >>> seq = Sequence.from_iterable(range(5))
+        >>> seq = Sequence(range(5))
         >>> seq.take(2).collect()
         [0, 1]
         """
@@ -252,7 +287,7 @@ class Sequence:
         """
         Eagerly returns first element in sequence
 
-        >>> seq = Sequence.from_iterable(range(5))
+        >>> seq = Sequence(range(5))
         >>> seq.first()
         0
         """
@@ -266,7 +301,7 @@ class Sequence:
         Concatenates another sequence to the end
         of this sequence
 
-        >>> seq = Sequence.from_iterable(range(5))
+        >>> seq = Sequence(range(5))
         >>> seq =seq.concat(seq)
         >>> seq.collect()
         [0, 1, 2, 3, 4, 0, 1, 2, 3, 4]
@@ -286,7 +321,7 @@ class Sequence:
         Returns a standard python iterator that you can
         use to lazily iterate over your sequence of data
 
-        >>> seq = Sequence.from_iterable(range(10))
+        >>> seq = Sequence(range(10))
         >>> seq = seq.map(lambda v: v*2)
         >>> i = 0
         >>> for item in seq.all():
@@ -298,7 +333,7 @@ class Sequence:
 
     def __iter__(self):
         """
-        >>> seq = Sequence.from_iterable(range(10))
+        >>> seq = Sequence(range(10))
         >>> seq = seq.map(lambda v: v*2)
         >>> i = 0
         >>> for item in seq:
@@ -313,7 +348,7 @@ class Sequence:
         """
         Eagerly returns all elements in sequence
 
-        >>> seq = Sequence.from_iterable(range(10))
+        >>> seq = Sequence(range(10))
         >>> seq.collect()
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         """
@@ -326,7 +361,7 @@ class Sequence:
         WARNING: this function loads the entirety of your sequence
         into memory.
 
-        >>> seq = Sequence.from_iterable([2, 1, 0, 4, 3])
+        >>> seq = Sequence([2, 1, 0, 4, 3])
         >>> seq.sort().collect()
         [0, 1, 2, 3, 4]
         """
@@ -348,12 +383,12 @@ class Sequence:
                 Function to be applied to each element of a group
 
             eager_group: bool, default=True
-                If true, eagerly convert a group from a lazy sequence to
-                a fully realized list.
+                If true, eagerly convert a group from a lazy Sequence to
+                a fully-realized list.
 
 
         >>> things = [("animal", "lion"), ("plant", "maple tree"), ("animal", "walrus"), ("plant", "grass")]
-        >>> seq = Sequence.from_iterable(things)
+        >>> seq = Sequence(things)
         >>> groups = seq.sort().groupby(key=lambda x: x[0], getter=lambda x: x[1])
         >>> for key, group in groups:
         ...     print(key, group)
@@ -389,7 +424,7 @@ class Sequence:
 
         >>> import random
         >>> random.seed(0)
-        >>> seq = Sequence.from_iterable(range(5))
+        >>> seq = Sequence(range(5))
         >>> seq.shuffle().collect()
         [2, 1, 0, 4, 3]
         """
@@ -407,7 +442,7 @@ class Sequence:
         Construct a Sequence from any data type that follows
         the iterator API.
 
-        >>> seq = Sequence.from_iterable([1,2,3])
+        >>> seq = Sequence([1,2,3])
         >>> seq.collect()
         [1, 2, 3]
         """

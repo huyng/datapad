@@ -1,4 +1,12 @@
 
+2019-12-26
+==========
+
+* Added `Sequnce.unique` function to get unique values from a sequence.
+* Added `Sequence.count(distinct=True)` function in order to count distinct elements in a sequence.
+
+
+* Make `seq.groupby` eagerly collect groups by default
 2019-12-11
 ==========
 
@@ -8,4 +16,4 @@
     * `fields.select` - limit the columns returned in each row
     * `fields.asdict` - converts lists to dicts
 
-* Make `seq.groupby` eagerly collect groups by default 
+* Make `seq.groupby` eagerly collect groups by default

@@ -32,6 +32,37 @@ def asdict(keys=None):
     return _function
 
 
+# def aslist(keys=None):
+#     '''
+#     Returns a function that will convert
+#     dicts to list, where keys are provided
+#     by `keys`. If `keys` is None, then return
+#     a list where elements are ordered by
+#     their corresponding dictionary keys in
+#     alphabetical order.
+
+#     Convert list to dict using pre-defined keys:
+
+#         >>> data = {'a': 1, 'b': 2, 'c': 3}
+#         >>> asdict(['b', 'a', 'c'])(data)
+
+
+#     Convert list to dict using list indices as keys:
+
+#         >>> data = [1, 2, 3]
+#         >>> asdict()(data)
+#         {0: 1, 1: 2, 2: 3}
+#     '''
+
+#     def _function(items):
+#         if keys is None:
+#             k = range(len(items))
+#         else:
+#             k = keys
+#         return dict(zip(k, items))
+#     return _function
+
+
 def select(keys):
     '''
     Returns a function to select

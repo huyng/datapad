@@ -27,7 +27,7 @@ def _from_glob_paths(path_or_paths):
         for p in glob.glob(path):
             yield p
 
-    seq = Sequence.from_iterable(paths)
+    seq = Sequence(paths)
     seq = seq.flatmap(_deglobify)
     return seq
 
