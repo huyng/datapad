@@ -436,6 +436,9 @@ class Sequence:
         seq = Sequence(_iterable=_f(self._iterable))
         return seq
 
+    def __repr__(self):
+        return '<Sequence at %s>' % hex(id(self))
+
 
 if __name__ == "__main__":
     import doctest
