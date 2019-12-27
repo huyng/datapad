@@ -1,14 +1,15 @@
-
 2019-12-26
 ==========
 
-* Added `Sequnce.unique` function to get unique values from a sequence.
+Version: 0.6.2
+
+* added `sequnce.unique` function to get unique values from a sequence.
 * Added `Sequence.count(distinct=True)` function in order to count distinct elements in a sequence.
 
-
-* Make `seq.groupby` eagerly collect groups by default
 2019-12-11
 ==========
+
+Version: 0.6.1
 
 * Added the new `datapad.fields` module which provides functions for operating on lists and dicts, as if they were "columns" in a sequence of rows. The following functions were added:
     * `fields.apply` - apply functions to columns of rows
