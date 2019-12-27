@@ -19,18 +19,18 @@ This project incorporates ideas from:
 pip install datapad
 ```
 
-#### Basic usage
+### Basic usage
 
 create a sequence
 
-```
+```python
 from datapad import Sequence
 seq = Sequence(range(10))
 ```
 
 map:
 
-```
+```python
 seq = Sequence(range(10))
 seq = seq.map(lambda v: v*2)
 seq.collect()
@@ -40,7 +40,7 @@ seq.collect()
 ```
 filter:
 
-```
+```python
 seq = Sequence(range(5))
 seq = seq.filter(lambda v: v > 1)
 seq.collect()
@@ -50,7 +50,7 @@ seq.collect()
 [2, 3, 4]
 ```
 pmap_unordered:
-```
+```python
 seq = Sequence(range(10))
 seq = seq.map(lambda v: v*2)
 seq.collect()
@@ -60,7 +60,7 @@ seq.collect()
 ```
 
 flatmap:
-```
+```python
 seq = Sequence(range(5))
 seq = seq.flatmap(lambda v: [v,v])
 seq.collect()
@@ -70,7 +70,7 @@ seq.collect()
 ```
 
 dropwhile:
-```
+```python
 seq = Sequence(range(5))
 seq = seq.dropwhile(lambda v: v > 1)
 seq.collect()
@@ -80,7 +80,7 @@ seq.collect()
 ```
 
 count:
-```
+```python
 seq = Sequence(range(5))
 seq.count()
 ```
@@ -89,7 +89,7 @@ seq.count()
 ```
 
 drop:
-```
+```python
 seq = Sequence(range(5))
 seq = seq.drop(2)
 seq.collect()
@@ -99,7 +99,7 @@ seq.collect()
 ```
 
 sort:
-```
+```python
 seq = Sequence([2, 1, 0, 4, 3])
 seq.sort().collect()
 ```
@@ -111,8 +111,11 @@ seq.sort().collect()
 
 groupby:
 
-```
-things = [("animal", "lion"), ("plant", "maple tree"), ("animal", "walrus"), ("plant", "grass")]
+```python
+things = [("animal", "lion"),
+          ("plant", "maple tree"),
+          ("animal", "walrus"),
+          ("plant", "grass")]
 seq = Sequence(things)
 groups = seq.sort().groupby(key=lambda x: x[0], getter=lambda x: x[1])
 for key, group in groups:
@@ -129,7 +132,7 @@ plant ['grass', 'maple tree']
 
 Suppose we have the following sequence
 
-```
+```python
 seq = Sequence([
    {'a': 1},
    {'a': 2},
@@ -139,7 +142,7 @@ seq = Sequence([
 
 Add fields:
 
-```
+```python
 import datapad.fields as f
 seq = seq.map(f.add({'b': lambda row: row['a'] + 3}))
 seq.collect()
@@ -155,7 +158,7 @@ seq.collect()
 
 Apply functions to fields:
 
-```
+```python
 import datapad.fields as f
 seq = seq.map(f.apply({'a': lambda x: x*2)})
 seq.collect()
@@ -171,7 +174,7 @@ seq.collect()
 
 Select fields from a row:
 
-```
+```python
 import datapad as dp
 import datapad.fields as f
 seq = dp.Sequence([{'a': 1, 'b': 2, 'c': 3}])
