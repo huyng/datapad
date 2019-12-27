@@ -436,19 +436,6 @@ class Sequence:
         seq = Sequence(_iterable=_f(self._iterable))
         return seq
 
-    @classmethod
-    def from_iterable(cls, iterable):
-        """
-        Construct a Sequence from any data type that follows
-        the iterator API.
-
-        >>> seq = Sequence([1,2,3])
-        >>> seq.collect()
-        [1, 2, 3]
-        """
-        seq = cls(_iterable=iterable)
-        return seq
-
 
 if __name__ == "__main__":
     import doctest
