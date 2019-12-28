@@ -3,8 +3,18 @@ import collections
 
 
 class Sequence:
+    """
+    The core object in datapad used to wrap sequence-like data types in a fluent-style API.
+    """
 
     def __init__(self, _iterable=None):
+        """
+        Instantiates a new Sequence object.
+
+        Args:
+            _iterable (List, Set, Tuple, Iterator):
+                Any object that conforms to the Iterable API.
+        """
         from collections.abc import Iterator
 
         _iterable = iter([]) if _iterable is None else _iterable
@@ -20,7 +30,7 @@ class Sequence:
         Lazily apply fn function to every element of iterable
 
         Args:
-            fn: function
+            fn (function):
                 Function with signature fn(element) to apply to every
                 element of sequence.
 
@@ -47,9 +57,9 @@ class Sequence:
         sequence is empty.
 
         Args:
-            fn: function
+            fn (function):
                 Function with signature fn(acc, current_item) -> acc_next
-            initial: Any
+            initial (Any):
                 An initial value that acc will be set to. If not provided,
                 this function will set the first element of the sequence as
                 the initial value.
@@ -81,15 +91,15 @@ class Sequence:
         THIS FUNCTION IS EXPERIMENTAL
 
         Args:
-            fn: function
+            fn (function):
                 Function with signature fn(element) -> element to apply to every
                 element of sequence.
-            workers: int (default: 3)
-                Number of parallel workers to use. These
+            workers (int):
+                Number of parallel workers to use (default: 3). These
                 workers are implemented as python threads.
-            ordered: bool (default: True)
+            ordered (bool):
                 Whether to yield results in the same order in which items
-                arrive. You may get better performance by setting this to false.
+                arrive. You may get better performance by setting this to false (default: True).
 
         >>> seq = Sequence(range(10))
         >>> seq = seq.pmap(lambda v: v*2)
@@ -118,10 +128,11 @@ class Sequence:
         into a single flattend sequence.
 
         Args:
-            fn: function
+            fn (function):
                 Function with signature fn(element) -> iterable(element) to apply to every
                 element of sequence.
 
+        Examples:
 
         >>> seq = Sequence(range(5))
         >>> seq = seq.flatmap(lambda v: [v,v])
@@ -223,12 +234,12 @@ class Sequence:
         else:
             return index + 1
 
-    def unique(self):
+    def distinct(self):
         """
         Eagerly returns a new sequence with unique values
 
         >>> seq = Sequence(['a', 'a', 'b', 'b', 'c', 'c'])
-        >>> seq.unique().collect()
+        >>> seq.distinct().collect()
         ['a', 'b', 'c']
         """
         odict = collections.OrderedDict.fromkeys(list(self))

@@ -1,24 +1,43 @@
 # Copyright(C) 2019 Huy Nguyen - All Rights Reserved
 
+"""
+Functions for manipulating and retrieving fields within structured sequences.
+These functions are often used in conjunction with the ``Sequence.map`` method to
+manipulate structured sequences.
+"""
 
 def asdict(keys=None):
     '''
-    Returns a function that will convert
-    lists to dicts, where keys are provided
-    by `keys`. If `keys` is None, then use
-    indices of list for keys.
+    Returns a function that will convert a list into a dict.
 
-    Convert list to dict using pre-defined keys:
+    The returned function will have the signature:
 
-        >>> data = [1, 2, 3]
-        >>> asdict(['a', 'b', 'c'])(data)
-        {'a': 1, 'b': 2, 'c': 3}
+        F(List) -> Dict
 
-    Convert list to dict using list indices as keys:
+    Args:
+        keys (list):
+            A list of strings or any other valid hashable type
+            that will be associated with each element of the input list.
+            If `keys` is None, F will use the indices of each list
+            element as the key.
 
-        >>> data = [1, 2, 3]
-        >>> asdict()(data)
-        {0: 1, 1: 2, 2: 3}
+    Returns:
+        A function F that will convert a list into a dict by associating
+        each element to a corresponding key provided by the input parameter `keys`.
+
+    Examples:
+
+        Convert list to dict using pre-defined keys:
+
+            >>> data = [1, 2, 3]
+            >>> asdict(['a', 'b', 'c'])(data)
+            {'a': 1, 'b': 2, 'c': 3}
+
+        Convert list to dict using list indices as keys:
+
+            >>> data = [1, 2, 3]
+            >>> asdict()(data)
+            {0: 1, 1: 2, 2: 3}
 
 
     '''
@@ -105,71 +124,94 @@ def select(keys):
 
 def apply(*args):
     '''
-    Returns a function which transforms each element of `data` using the
-    functions specified by `func` or `funcs`, in the following
-    call signatures.
+    Constructs a function to transform the fields in a dict or list of ``data``.
+    The returned function will assume one of the following signatures::
 
-    Possible Call Signatures:
-        apply(func:Function)
-        apply(key:Hashable, func:Function)
-        apply(funcs:List[func:Function])
-        apply(funcs:Dict[key:Hashable, func:Function])
+        F(data:list) -> list
+        F(data:dict) -> dict
+
+    This function is commonly used in conjunction with :func:`datapad.Sequence.map`
+    to manipulate structured sequence data.
+
+    Possible ways to call the ``apply`` function::
+
+        # apply func to all fields in data
+        apply(func: Function)
+
+        # apply func to data[key] field
+        apply(key: Hashable, func: Function)
+
+        # apply funcs[i] to data[i] fields
+        apply(funcs: List[Function])
+
+        # apply funcs[key] to data[key] fields
+        apply(funcs: Dict[Hashable, Function])
 
     Args:
-        key:
+        key (string, int, hashable):
             A string, int, or other hashable value to be used to look up
-            the value to apply the transform to.
-        func:
-            Function of the form f(element: Any) -> Any to compute the value
-            of the newly added element.
+            the field value to transform.
 
-        funcs: function, list, or dict
-            Functions must be of the form f(element: Any) -> Any.
-            - If funcs is a single function, apply funcs to all elements in data.
-            - If funcs is a list, apply funcs[i] to data[i].
-            - If funcs is a dict, apply funcs[key] to data[key].
-            - If a function in `funcs` does not exist for a key in data,
-              return the data[key] untransformed.
-            - Ignore any functions in funcs that don't have keys in data.
+        func (function):
+            A function that will take a single field value and transform it into a new value.
 
-    Apply single function to all fields:
+        funcs (List[Function], or Dict[Hashable, Function]):
+            - If funcs is a list, ``F(data)`` will apply ``funcs[i]`` to ``data[i]``.
+            - If funcs is a dict, ``F(data)`` will apply ``funcs[key]`` to ``data[key]``.
+            - If a key in ``data`` has no corresponding key in ``funcs``, return the ``data[key]`` field untransformed.
+            - If a key in ``funcs`` has no corresponding key in ``data``, abstain from applying ``funcs[key]``
 
-        >>> data = [1, 2, 3]
-        >>> f = apply(lambda x: x * 2)
-        >>> f(data)
-        [2, 4, 6]
+    Examples:
 
-    Apply single function to a single field:
+        In the examples below, assume ``data`` represents a single row or element
+        from a :class:`datapad.Sequence` object.
 
-        >>> data = [1, 2, 3]
-        >>> f = apply(1, lambda x: x * 2)
-        >>> f(data)
-        [1, 4, 3]
+        Apply a single function to all fields:
 
-        >>> data = {'a': 1, 'b': 2, 'c': 3}
-        >>> f = apply('a', lambda x: x * 2)
-        >>> f(data)
-        {'a': 2, 'b': 2, 'c': 3}
+            >>> data = [1, 2, 3]
+            >>> f = apply(lambda x: x * 2)
+            >>> f(data)
+            [2, 4, 6]
 
-    Apply a dict of functions:
+        Apply a single function to a single field of a list
+        (i.e. the value associated with the 2nd index):
 
-        >>> data = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
-        >>> f = apply({'a': lambda x: x*3, 'b': lambda x: 'foo'})
-        >>> f(data)
-        {'a': 3, 'b': 'foo', 'c': 3, 'd': 4}
+            >>> data = [1, 2, 3]
+            >>> f = apply(1, lambda x: x * 2)
+            >>> f(data)
+            [1, 4, 3]
 
-        >>> data = [1, 2, 3, 4]
-        >>> f = apply({1: lambda x: x*3, 0: lambda x: 'foo'})
-        >>> f(data)
-        ['foo', 6, 3, 4]
+        Apply a single function to a single field of a dict
+        (i.e. the value associated with key 'a'):
 
-    Apply a list of functions:
+            >>> data = {'a': 1, 'b': 2, 'c': 3}
+            >>> f = apply('a', lambda x: x * 2)
+            >>> f(data)
+            {'a': 2, 'b': 2, 'c': 3}
 
-        >>> data = [1, 2, 3, 4]
-        >>> f = apply([lambda x: x*2, lambda x: x*3])
-        >>> f(data)
-        [2, 6, 3, 4]
+        Apply multiple functions to several fields of a dict
+        (i.e. the values associated with keys 'a', 'b', 'c', and 'd'):
 
+            >>> data = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
+            >>> f = apply({'a': lambda x: x*3, 'b': lambda x: 'foo'})
+            >>> f(data)
+            {'a': 3, 'b': 'foo', 'c': 3, 'd': 4}
+
+        Apply multiple functions to several fields of a list
+        (i.e. the values associated with index 0, and 1):
+
+            >>> data = [1, 2, 3, 4]
+            >>> f = apply({1: lambda x: x*3, 0: lambda x: 'foo'})
+            >>> f(data)
+            ['foo', 6, 3, 4]
+
+        Apply multiple functions to several fields of a list
+        (i.e. the values associated with index 0, and 1):
+
+            >>> data = [1, 2, 3, 4]
+            >>> f = apply([lambda x: x*2, lambda x: x*3])
+            >>> f(data)
+            [2, 6, 3, 4]
 
     '''
 

@@ -1,9 +1,9 @@
 2019-12-26
 ==========
 
-Version: 0.6.2
+Version: 0.6.3
 
-* added `sequnce.unique` function to get unique values from a sequence.
+* added `sequnce.distinct` function to get unique values from a sequence.
 * Added `Sequence.count(distinct=True)` function in order to count distinct elements in a sequence.
 
 2019-12-11

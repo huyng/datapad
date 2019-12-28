@@ -1,5 +1,9 @@
 # Copyright(C) 2019 Huy Nguyen - All Rights Reserved
 
+"""
+Convenience functions for creating Sequences from files and other input sources.
+"""
+
 from .sequence import Sequence
 
 def _from_glob_paths(path_or_paths):
