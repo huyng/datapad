@@ -18,6 +18,7 @@ datapad.Sequence
       ~Sequence.collect
       ~Sequence.concat
       ~Sequence.count
+      ~Sequence.distinct
       ~Sequence.drop
       ~Sequence.drop_if
       ~Sequence.filter
@@ -31,7 +32,6 @@ datapad.Sequence
       ~Sequence.shuffle
       ~Sequence.sort
       ~Sequence.take
-      ~Sequence.unique
       ~Sequence.zip_with_index
    
    

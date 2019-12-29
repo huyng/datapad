@@ -5,11 +5,13 @@
 
 .. image:: _static/logo.png
     :width: 30%
-    :align: right
+    :align: center
 
-=========================================
-Datapad - Fluent APIs for data processing
-=========================================
+|
+
+==================================================
+Datapad: Fluent APIs for Exploratory Data Analysis
+==================================================
 
 
 Datapad is a Python library for processing sequence-like data using a `fluent style API <https://en.wikipedia.org/wiki/Fluent_interface>`_. You can think of it as syntatic sugar for Python's ``itertools`` package (plus some additional goodies).
@@ -22,7 +24,7 @@ Install datapad with the following command::
 
     pip install -U datapad
 
-**Brewing with Datapad**
+**Analyzing data with Datapad**
 
 See what you can do with `datapad` in the examples below:
 

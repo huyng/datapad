@@ -4,10 +4,11 @@ Frequently Asked Questions
 
 * **What was the motivation for developing Datapad?**
 
-    Datapad stemmed from my desire to create a "humans" friendly data processing library with an API designed first and foremost focused on "developer happiness" as opposed to performance, distributed execution, or other concerns.
+    Datapad was created to build succinct, and concise exploratory data analysis pipelines.
 
-    This meant that the library would be easy to install, worked locally, and had a minimal yet intuitive API.
+* **In what scenarios or when should I use Datapad?**
 
+    Datapad is most often used in data science workflows to load, clean, manipulate, and explore data before training models.
 
 * **What other related projects are there?**
 
@@ -17,6 +18,7 @@ Frequently Asked Questions
     * `Spark <https://spark.apache.org/>`_
     * `Python itertools <https://docs.python.org/3/library/itertools.html>`_
     * `Pandas <https://pandas.pydata.org/>`_
+    * `Dask <https://docs.dask.org/en/latest/>`_
     * `Tensorflow tf.data.Datasets <https://www.tensorflow.org/api_docs/python/tf/data/Dataset>`_
 
 * **How does this project compare to Spark**?

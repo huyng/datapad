@@ -8,22 +8,20 @@ manipulate structured sequences.
 
 def asdict(keys=None):
     '''
-    Returns a function that will convert a list into a dict.
+    Constructs a function that will convert a list into a dict using the given
+    keys. The returned function will have the signature::
 
-    The returned function will have the signature:
+        F(data:list) -> dict
 
-        F(List) -> Dict
+    This function is commonly used in conjunction with :func:`datapad.Sequence.map`
+    to manipulate structured sequence data.
 
     Args:
         keys (list):
             A list of strings or any other valid hashable type
-            that will be associated with each element of the input list.
-            If `keys` is None, F will use the indices of each list
-            element as the key.
-
-    Returns:
-        A function F that will convert a list into a dict by associating
-        each element to a corresponding key provided by the input parameter `keys`.
+            that will be associated with each element of the input
+            ``data`` list. If `keys` is None, ``F(data)`` will use the
+            indices of each list field as the key.
 
     Examples:
 
@@ -169,48 +167,48 @@ def apply(*args):
         Apply a single function to all fields:
 
             >>> data = [1, 2, 3]
-            >>> f = apply(lambda x: x * 2)
-            >>> f(data)
+            >>> F = apply(lambda x: x * 2)
+            >>> F(data)
             [2, 4, 6]
 
         Apply a single function to a single field of a list
         (i.e. the value associated with the 2nd index):
 
             >>> data = [1, 2, 3]
-            >>> f = apply(1, lambda x: x * 2)
-            >>> f(data)
+            >>> F = apply(1, lambda x: x * 2)
+            >>> F(data)
             [1, 4, 3]
 
         Apply a single function to a single field of a dict
         (i.e. the value associated with key 'a'):
 
             >>> data = {'a': 1, 'b': 2, 'c': 3}
-            >>> f = apply('a', lambda x: x * 2)
-            >>> f(data)
+            >>> F = apply('a', lambda x: x * 2)
+            >>> F(data)
             {'a': 2, 'b': 2, 'c': 3}
 
         Apply multiple functions to several fields of a dict
         (i.e. the values associated with keys 'a', 'b', 'c', and 'd'):
 
             >>> data = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
-            >>> f = apply({'a': lambda x: x*3, 'b': lambda x: 'foo'})
-            >>> f(data)
+            >>> F = apply({'a': lambda x: x*3, 'b': lambda x: 'foo'})
+            >>> F(data)
             {'a': 3, 'b': 'foo', 'c': 3, 'd': 4}
 
         Apply multiple functions to several fields of a list
         (i.e. the values associated with index 0, and 1):
 
             >>> data = [1, 2, 3, 4]
-            >>> f = apply({1: lambda x: x*3, 0: lambda x: 'foo'})
-            >>> f(data)
+            >>> F = apply({1: lambda x: x*3, 0: lambda x: 'foo'})
+            >>> F(data)
             ['foo', 6, 3, 4]
 
         Apply multiple functions to several fields of a list
         (i.e. the values associated with index 0, and 1):
 
             >>> data = [1, 2, 3, 4]
-            >>> f = apply([lambda x: x*2, lambda x: x*3])
-            >>> f(data)
+            >>> F = apply([lambda x: x*2, lambda x: x*3])
+            >>> F(data)
             [2, 6, 3, 4]
 
     '''
@@ -269,52 +267,76 @@ def apply(*args):
 
 def add(*args):
     '''
-    Returns a function that when given a dict or list as `data` will add new keys
-    or append new elements which are computed by applying functions
-    in `funcs` to `data`.
+    Constructs a function to add or append new fields to a dict or list of ``data``.
+    The returned function will assume one of the following signatures::
 
-    Possible Call Signatures:
-        add(func:Function)
-        add(key:Hashable, func:Function)
-        add(funcs:List[func:Function])
-        add(funcs:Dict[key:Hashable, func:Function])
+        F(data: list) -> list
+        F(data: dict) -> dict
+
+    This function is commonly used in conjunction with :func:`datapad.Sequence.map`
+    to add new fields to structured sequence data.
+
+    Possible ways to call the ``add`` function::
+
+        # Append a single field with a value of `func(data)` to list `data`
+        add(func: Function)
+
+        # Add a single field to dict `data` by applying `data[key]` = `func(data)`
+        add(key: Hashable, func: Function)
+
+        # Append multiple fields with values [f(data) for f in funcs] to a list `data`
+        add(funcs: List[func: Function])
+
+        # Add multiple fields to a dict `data` by applying `data[key]` = `funcs[key](data)`
+        add(funcs: Dict[key: Hashable, value: Function])
 
     Args:
-        key:
+        key (hashable):
             A string, int, or other hashable value to be used as the name of the
             added field.
-        func:
-            Function of the form f(data:(List|Dict)) to compute the value
+
+        func (function):
+            A function of the form ``f(data)`` to compute the value
             of the newly added element.
 
+        funcs (List[Function], or Dict[Hashable, Function]):
+            - If funcs is a list, ``data`` will be extended with values computed from ``f(data) for f in funcs``
+            - If funcs is a dict, ``data[key]`` will be updated with values computed from ``funcs[key]``.
+              Note: this will overwrite any existing keys with the same name in ``data``.
 
-    Add a single new element to end of list
 
-        >>> data = [1, 2, 3]
-        >>> f = add(lambda d: d[0]* d[1] * d[2])
-        >>> f(data)
-        [1, 2, 3, 6]
+    Examples:
 
-    Add a single new dictionary key and value:
+        In the examples below, assume ``data`` represents a single row or element
+        from a :class:`datapad.Sequence` object.
 
-        >>> data = {'a': 1, 'b': 2}
-        >>> f = add('c', lambda d: d['a'] + d['b'])
-        >>> f(data)
-        {'a': 1, 'b': 2, 'c': 3}
+        Add a single new element to end of list
 
-    Add new dictionary keys:
+            >>> data = [1, 2, 3]
+            >>> F = add(lambda data: data[0] * data[1] * data[2])
+            >>> F(data)
+            [1, 2, 3, 6]
 
-        >>> data = {'a': 1, 'b': 2}
-        >>> f = add({ 'c': (lambda d: d['a'] + d['b']), 'd': lambda d: 10})
-        >>> f(data)
-        {'a': 1, 'b': 2, 'c': 3, 'd': 10}
+        Add a single new dictionary key and value:
 
-    Append new list elements:
+            >>> data = {'a': 1, 'b': 2}
+            >>> F = add('c', lambda data: data['a'] + data['b'])
+            >>> F(data)
+            {'a': 1, 'b': 2, 'c': 3}
 
-        >>> data = ['foo', 'bar']
-        >>> f = add([lambda d: d[1] + d[0]])
-        >>> f(data)
-        ['foo', 'bar', 'barfoo']
+        Add new dictionary keys:
+
+            >>> data = {'a': 1, 'b': 2}
+            >>> F = add({ 'c': (lambda data: data['a'] + data['b']), 'd': lambda data: 10})
+            >>> F(data)
+            {'a': 1, 'b': 2, 'c': 3, 'd': 10}
+
+        Append new list elements:
+
+            >>> data = ['foo', 'bar']
+            >>> F = add([lambda data: data[1] + data[0]])
+            >>> F(data)
+            ['foo', 'bar', 'barfoo']
 
     '''
 
