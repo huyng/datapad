@@ -2,7 +2,7 @@
 
 """
 Functions for manipulating and retrieving fields within structured sequences.
-These functions are often used in conjunction with the ``Sequence.map`` method to
+These functions are often used in conjunction with the :func:`datapad.Sequence.map` method to
 manipulate structured sequences.
 """
 
