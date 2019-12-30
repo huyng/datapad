@@ -72,6 +72,7 @@ For a more in-depth overview, see the "Getting Started" guide.
     :maxdepth: 3
     :caption: The User Guide
 
+    Home <https://datapad.readthedocs.io/en/latest/>
     install
     quickstart
     reference
