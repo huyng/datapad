@@ -1,8 +1,8 @@
-[![PyPI version](https://badge.fury.io/py/datapad.svg)](https://badge.fury.io/py/datapad)
-
 # Datapad: A Fluent API for Exploratory Data Analysis
 
-Datapad is a library for to processing sequence-based data using a [fluent API](https://en.wikipedia.org/wiki/Fluent_interface#Python). Think of it as an extended and chainable version of Python's `itertools` library.
+[![PyPI version](https://badge.fury.io/py/datapad.svg)](https://badge.fury.io/py/datapad)
+
+Datapad is a library for to processing sequence-based data using a [Fluent API](https://en.wikipedia.org/wiki/Fluent_interface#Python). Think of it as an extended and chainable version of Python's `itertools` library.
 
 
 ### Install
