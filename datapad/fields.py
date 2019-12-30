@@ -28,13 +28,15 @@ def asdict(keys=None):
         Convert list to dict using pre-defined keys:
 
             >>> data = [1, 2, 3]
-            >>> asdict(['a', 'b', 'c'])(data)
+            >>> F = asdict(['a', 'b', 'c'])
+            >>> F(data)
             {'a': 1, 'b': 2, 'c': 3}
 
         Convert list to dict using list indices as keys:
 
             >>> data = [1, 2, 3]
-            >>> asdict()(data)
+            >>> F = asdict()
+            >>> F(data)
             {0: 1, 1: 2, 2: 3}
 
 
@@ -82,20 +84,21 @@ def asdict(keys=None):
 
 def select(keys):
     '''
-    Returns a function to select
-    keys from a list or dict. If key is not
-    present in data, default to None.
+    Constructs a function to select fields from a list or dict.
+    If a field-key is not present in data, default to None.
 
     Select from a list:
 
         >>> data = [1, 2, 3]
-        >>> select([0, 2])(data)
+        >>> F = select([0, 2])
+        >>> F(data)
         [1, 3]
 
     Select from a dictionary:
 
         >>> data = {'a': 2, 'b': 1, 'c': 4}
-        >>> select(['c', 'b', 'k'])(data)
+        >>> F = select(['c', 'b', 'k'])
+        >>> F(data)
         {'c': 4, 'b': 1, 'k': None}
 
     '''

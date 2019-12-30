@@ -35,6 +35,14 @@ Frequently Asked Questions
 
     In our opinion, this central design pattern requires less mental overhead for interacting with your data (although it can be slower in some instances).
 
+* **How does this project compare to tensorflow.data.Dataset**?
+
+    There's no shame in saying that tensorflow datasets was very influential in building this library. The main difference is that tf.data.Dataset functions are executed within a graph runtime and is heavily tied to tensorflow infrastructure.
+
+    Furthermore, because of the graph & tensor abstractions that tensorflow requires, tf.data.Datasets is less convenient to use for a variety of data sequences with more dynamic types.
+
+    Datapad is a standalone library for data processing, while in comparison Tensorflow Dataset is heavily integrated with the tensorflow ecosystem and less suitable for use in standalone projects.
+
 
 
 

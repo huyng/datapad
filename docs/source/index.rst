@@ -3,16 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. image:: _static/logo.png
-    :width: 30%
-    :align: center
-
-|
-
-==================================================
-Datapad: Fluent APIs for Exploratory Data Analysis
-==================================================
-
+=============================================================
+Datapad: A Fluent API for Exploratory Data Analysis in Python
+=============================================================
 
 Datapad is a Python library for processing sequence-like data using a `fluent style API <https://en.wikipedia.org/wiki/Fluent_interface>`_. You can think of it as syntatic sugar for Python's ``itertools`` package (plus some additional goodies).
 
@@ -24,27 +17,27 @@ Install datapad with the following command::
 
     pip install -U datapad
 
-**Analyzing data with Datapad**
+**Exploratory data analysis with Datapad**
 
 See what you can do with `datapad` in the examples below:
 
 
     >>> import datapad as dp
     >>> data = ['a', 'b', 'b', 'c', 'c', 'c']
-    >>> seq = dp.Sequence(data)\
-    ...         .distinct()\
-    ...         .map(lambda x: x+'z')\
-    ...         .map(lambda x: (x, len(x)))\
-    ...         .collect()
+    >>> seq = dp.Sequence(data)
+    >>> seq.distinct() \
+    ...    .map(lambda x: x+'z') \
+    ...    .map(lambda x: (x, len(x))) \
+    ...    .collect()
     [('az', 2),
      ('bz', 2),
      ('cz', 2)]
 
     >>> import datapad as dp
     >>> data = ['a', 'b', 'b', 'c', 'c', 'c']
-    >>> seq = dp.Sequence(data)\
-    ...         .count(distinct=True)\
-    ...         .collect()
+    >>> seq = dp.Sequence(data)
+    >>> seq.count(distinct=True) \
+    ...    .collect()
     [('a', 1),
      ('b', 2),
      ('c', 3)]
@@ -57,8 +50,8 @@ See what you can do with `datapad` in the examples below:
     ...     {'a': 5, 'b': 7}
     ... ]
     >>> seq = dp.Sequence(data)
-    >>> seq.map(F.apply('a', lambda x: x*2))\
-    ...    .map(F.apply('b', lambda x: x*3))\
+    >>> seq.map(F.apply('a', lambda x: x*2)) \
+    ...    .map(F.apply('b', lambda x: x*3)) \
     ...    .collect()
     [{'a': 2, 'b': 6},
      {'a': 8, 'b': 12},
