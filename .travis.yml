@@ -6,9 +6,16 @@ python:
   - "3.8-dev"  # 3.8 development branch
   - "nightly"  # nightly build
 # command to install dependencies
+before_install:
+  - pip install codecov
+  - pip install coverage
+
 install:
   - python setup.py install
 
 # command to run tests
 script:
-  - python setup.py test
+  - coverage run --source datapad python setup.py test
+
+after_success:
+  - codecov
