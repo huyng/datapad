@@ -37,18 +37,6 @@ pip install datapad
 
 See what you can do with `datapad` in the examples below:
 
-```python
->>> import datapad as dp
->>> data = ['a', 'b', 'b', 'c', 'c', 'c']
->>> seq = dp.Sequence(data)
->>> seq.distinct() \
-...    .map(lambda x: x+'z') \
-...    .map(lambda x: (x, len(x))) \
-...    .collect()
-[('az', 2),
- ('bz', 2),
- ('cz', 2)]
-```
 
 ```python
 >>> import datapad as dp
@@ -76,6 +64,19 @@ See what you can do with `datapad` in the examples below:
 [{'a': 2, 'b': 6},
  {'a': 8, 'b': 12},
  {'a': 10, 'b': 21}]
+```
+
+```python
+>>> import datapad as dp
+>>> data = ['a', 'b', 'b', 'c', 'c', 'c']
+>>> seq = dp.Sequence(data)
+>>> seq.distinct() \
+...    .map(lambda x: x+'z') \
+...    .map(lambda x: (x, len(x))) \
+...    .collect()
+[('az', 2),
+ ('bz', 2),
+ ('cz', 2)]
 ```
 
 This project incorporates ideas from:
