@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img width="300" height="300" src="https://user-images.githubusercontent.com/121183/71598651-89c90800-2afc-11ea-96f1-c78b58674ee5.png">
+  <img width="200" height="200" src="https://user-images.githubusercontent.com/121183/71598651-89c90800-2afc-11ea-96f1-c78b58674ee5.png">
 </p>
 
 # Datapad: A Fluent API for Exploratory Data Analysis
