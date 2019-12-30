@@ -145,7 +145,7 @@ You can find all unique values in a `Sequence` by calling the :func:`~datapad.Se
 Structured sequences
 ====================
 
-In nontrivial use-cases, `Sequences` are often made up of `Dictionaries`, `Lists`, or other container data types. Datapad provides a set functions in the :mod:`datapad.fields` module to work with these nested data types.
+In nontrivial use-cases, `Sequences` are often made up of `Dictionaries`, `Lists`, or other container data-types. Datapad provides a set of functions in the :mod:`datapad.fields` module to work with these nested data types.
 
 Combining this module along with  methods like :func:`datapad.Sequence.map` gives you a flexible and powerful framework for manipulating data sequences containing dictionaries and lists.
 
