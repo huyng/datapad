@@ -14,9 +14,9 @@
 Datapad: A Fluent API for Exploratory Data Analysis in Python
 =============================================================
 
-Datapad is a Python library for processing sequence and stream data using a `Fluent style API <https://en.wikipedia.org/wiki/Fluent_interface>`_. Data scientists and researchers use it as a lightweight toolset to efficiently explore datasets and to massage/clean data for modeling tasks.
+Datapad is a Python library for processing sequence and stream data using a `Fluent style API <https://en.wikipedia.org/wiki/Fluent_interface>`_. Data scientists and researchers use it as a lightweight toolset to efficiently explore datasets and to massage data for modeling tasks.
 
-You can think of it as syntatic sugar for Python's `itertools <https://docs.python.org/3.8/library/itertools.html>`_ module (plus some additional goodies).
+It can be viewed as a combination of syntatic sugar for Python's `itertools <https://docs.python.org/3.8/library/itertools.html>`_ module and supercharged tools for working with :ref:`structured-sequences`.
 
 Datapad optimizes for developer happiness by providing an intuitive, consistent, and minimal API to manipulate a wide variety of data.
 

@@ -140,6 +140,7 @@ You can find all unique values in a `Sequence` by calling the :func:`~datapad.Se
     ['a', 'b', 'c', 'd']
 
 
+.. _structured-sequences:
 
 Structured sequences
 ====================
