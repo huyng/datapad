@@ -10,8 +10,9 @@
   <img height="200" src="https://user-images.githubusercontent.com/121183/71599089-4cfe1080-2afe-11ea-8852-81f00ed8c3fa.jpg">
 </p>
 
-Datapad is a library for to processing sequence-based data using a [Fluent API](https://en.wikipedia.org/wiki/Fluent_interface#Python). Think of it as an extended and chainable version of Python's `itertools` library.
+Datapad is a Python library for processing sequence and stream data using a [Fluent style API](https://en.wikipedia.org/wiki/Fluent_interface#Python). Data scientists and researchers use it as a lightweight toolset to efficiently explore datasets and to massage/clean data for modeling tasks.
 
+You can think of it as syntatic sugar for Python’s itertools module (plus some additional goodies).
 
 ### Install
 

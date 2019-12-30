@@ -3,15 +3,24 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. image:: _static/logo.jpg
+  :height: 170
+  :alt: Datapad Logo
+  :align: center
+
+|
+
 =============================================================
 Datapad: A Fluent API for Exploratory Data Analysis in Python
 =============================================================
 
-Datapad is a Python library for processing sequence-like data using a `fluent style API <https://en.wikipedia.org/wiki/Fluent_interface>`_. You can think of it as syntatic sugar for Python's ``itertools`` package (plus some additional goodies).
+Datapad is a Python library for processing sequence and stream data using a `Fluent style API <https://en.wikipedia.org/wiki/Fluent_interface>`_. Data scientists and researchers use it as a lightweight toolset to efficiently explore datasets and to massage/clean data for modeling tasks.
 
-Datapad aims to optimize for developer happiness by providing an intuitive, consistent, and minimal API to manipulate a wide variety of data.
+You can think of it as syntatic sugar for Python's `itertools <https://docs.python.org/3.8/library/itertools.html>`_ module (plus some additional goodies).
 
-**Get Datapad**
+Datapad optimizes for developer happiness by providing an intuitive, consistent, and minimal API to manipulate a wide variety of data.
+
+**Getting Datapad**
 
 Install datapad with the following command::
 
