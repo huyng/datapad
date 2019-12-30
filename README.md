@@ -4,14 +4,6 @@
 
 Datapad is a library for to processing sequence-based data using a [fluent API](https://en.wikipedia.org/wiki/Fluent_interface#Python). Think of it as an extended and chainable version of Python's `itertools` library.
 
-This project incorporates ideas from:
-
-* [LINQ](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/standard-query-operators-overview)
-* [Spark](https://spark.apache.org/)
-* [Python Itertools](https://docs.python.org/3/library/itertools.html)
-* [Pandas](https://pandas.pydata.org/)
-* [Dask](https://dask.org/)
-* [Tensorflow tf.data.Datasets](https://www.tensorflow.org/api_docs/python/tf/data/Dataset)
 
 ### Install
 
@@ -63,3 +55,12 @@ See what you can do with `datapad` in the examples below:
 {'a': 8, 'b': 12},
 {'a': 10, 'b': 21}]
 ```
+
+This project incorporates ideas from:
+
+* [LINQ](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/standard-query-operators-overview)
+* [Spark](https://spark.apache.org/)
+* [Python Itertools](https://docs.python.org/3/library/itertools.html)
+* [Pandas](https://pandas.pydata.org/)
+* [Dask](https://dask.org/)
+* [Tensorflow tf.data.Datasets](https://www.tensorflow.org/api_docs/python/tf/data/Dataset)
