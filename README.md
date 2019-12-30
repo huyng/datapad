@@ -17,7 +17,7 @@ This project incorporates ideas from:
 pip install datapad
 ```
 
-**Exploratory data analysis with Datapad**
+### Exploratory data analysis with Datapad
 
 See what you can do with `datapad` in the examples below:
 
