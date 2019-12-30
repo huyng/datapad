@@ -1,4 +1,4 @@
-# Datapad
+# Datapad: A Fluent API for Exploratory Data Analysis in Python
 
 Datapad is a library for to processing sequence-based data using a [fluent API](https://en.wikipedia.org/wiki/Fluent_interface#Python). Think of it as an extended and chainable version of Python's `itertools` library.
 
