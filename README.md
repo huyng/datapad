@@ -29,6 +29,8 @@ You can think of it as syntatic sugar for Python’s [itertools module](https://
 
 [Learn more in Documentation](https://datapad.readthedocs.io/en/latest/)
 
+---
+
 ### Install
 
 ```
