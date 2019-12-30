@@ -1,3 +1,8 @@
+
+<p align="center">
+  <img width="300" height="300" src="https://user-images.githubusercontent.com/121183/71598651-89c90800-2afc-11ea-96f1-c78b58674ee5.png">
+</p>
+
 # Datapad: A Fluent API for Exploratory Data Analysis
 
 [![Build Status](https://travis-ci.org/huyng/datapad.svg?branch=master)](https://travis-ci.org/huyng/datapad)
@@ -26,8 +31,8 @@ See what you can do with `datapad` in the examples below:
 ...    .map(lambda x: (x, len(x))) \
 ...    .collect()
 [('az', 2),
-('bz', 2),
-('cz', 2)]
+ ('bz', 2),
+ ('cz', 2)]
 ```
 
 ```python
@@ -37,8 +42,8 @@ See what you can do with `datapad` in the examples below:
 >>> seq.count(distinct=True) \
 ...    .collect()
 [('a', 1),
-('b', 2),
-('c', 3)]
+ ('b', 2),
+ ('c', 3)]
 ```
 
 ```python
@@ -54,8 +59,8 @@ See what you can do with `datapad` in the examples below:
 ...    .map(F.apply('b', lambda x: x*3)) \
 ...    .collect()
 [{'a': 2, 'b': 6},
-{'a': 8, 'b': 12},
-{'a': 10, 'b': 21}]
+ {'a': 8, 'b': 12},
+ {'a': 10, 'b': 21}]
 ```
 
 This project incorporates ideas from:
