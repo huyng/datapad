@@ -27,6 +27,8 @@ Datapad is a Python library for processing sequence and stream data using a [Flu
 
 You can think of it as syntatic sugar for Python’s [itertools module](https://docs.python.org/3.8/library/itertools.html) (plus some additional goodies).
 
+[Learn more in Documentation](https://datapad.readthedocs.io/en/latest/)
+
 ### Install
 
 ```
