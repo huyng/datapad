@@ -14,4 +14,6 @@ python:
   version: 3.7
   install:
     - method: pip
-      path: 'Sphinx>=2.3.1'
+      path: .
+      extra_requirements:
+        - 'Sphinx>=2.3.1'
