@@ -83,6 +83,10 @@ See what you can do with `datapad` in the examples below:
  ('cz', 2)]
 ```
 
+**[Documentation](https://datapad.readthedocs.io/en/latest/)**
+
+---
+
 This project incorporates ideas from:
 
 * [LINQ](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/standard-query-operators-overview)
