@@ -7,7 +7,7 @@
 [![Code Coverage](https://codecov.io/gh/huyng/datapad/branch/master/graph/badge.svg)](https://codecov.io/gh/huyng/datapad)
 
 <p align="center">
-  <img width="300" height="300" src="https://user-images.githubusercontent.com/121183/71598651-89c90800-2afc-11ea-96f1-c78b58674ee5.png">
+  <img height="200" src="https://user-images.githubusercontent.com/121183/71599089-4cfe1080-2afe-11ea-8852-81f00ed8c3fa.jpg">
 </p>
 
 Datapad is a library for to processing sequence-based data using a [Fluent API](https://en.wikipedia.org/wiki/Fluent_interface#Python). Think of it as an extended and chainable version of Python's `itertools` library.
