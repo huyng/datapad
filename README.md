@@ -39,7 +39,7 @@ pip install datapad
 
 ### Exploratory data analysis with Datapad
 
-See what you can do with `datapad` in the examples below:
+See what you can do with `datapad` in the examples below.
 
 
 **Count all unique items in a sequence:**
