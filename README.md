@@ -42,6 +42,8 @@ pip install datapad
 See what you can do with `datapad` in the examples below:
 
 
+**Count all unique items in a sequence:**
+
 ```python
 >>> import datapad as dp
 >>> data = ['a', 'b', 'b', 'c', 'c', 'c']
@@ -52,6 +54,8 @@ See what you can do with `datapad` in the examples below:
  ('b', 2),
  ('c', 3)]
 ```
+
+**Transform individual fields in a sequence:**
 
 ```python
 >>> import datapad as dp
@@ -70,6 +74,8 @@ See what you can do with `datapad` in the examples below:
  {'a': 10, 'b': 21}]
 ```
 
+**Chain together multiple transforms for elements of a sequence:**
+
 ```python
 >>> import datapad as dp
 >>> data = ['a', 'b', 'b', 'c', 'c', 'c']
@@ -82,6 +88,8 @@ See what you can do with `datapad` in the examples below:
  ('bz', 2),
  ('cz', 2)]
 ```
+
+Check out our documentation below to see what else is possible with Datapad:
 
 **[Documentation](https://datapad.readthedocs.io/en/latest/)**
 

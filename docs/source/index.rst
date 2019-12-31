@@ -31,16 +31,7 @@ Install datapad with the following command::
 See what you can do with `datapad` in the examples below:
 
 
-    >>> import datapad as dp
-    >>> data = ['a', 'b', 'b', 'c', 'c', 'c']
-    >>> seq = dp.Sequence(data)
-    >>> seq.distinct() \
-    ...    .map(lambda x: x+'z') \
-    ...    .map(lambda x: (x, len(x))) \
-    ...    .collect()
-    [('az', 2),
-     ('bz', 2),
-     ('cz', 2)]
+**Count all unique items in a sequence:**
 
     >>> import datapad as dp
     >>> data = ['a', 'b', 'b', 'c', 'c', 'c']
@@ -50,6 +41,8 @@ See what you can do with `datapad` in the examples below:
     [('a', 1),
      ('b', 2),
      ('c', 3)]
+
+**Transform individual fields in a sequence:**
 
     >>> import datapad as dp
     >>> import datapad.fields as F
@@ -65,6 +58,19 @@ See what you can do with `datapad` in the examples below:
     [{'a': 2, 'b': 6},
      {'a': 8, 'b': 12},
      {'a': 10, 'b': 21}]
+
+**Chain together multiple transforms for elements of a sequence:**
+
+    >>> import datapad as dp
+    >>> data = ['a', 'b', 'b', 'c', 'c', 'c']
+    >>> seq = dp.Sequence(data)
+    >>> seq.distinct() \
+    ...    .map(lambda x: x+'z') \
+    ...    .map(lambda x: (x, len(x))) \
+    ...    .collect()
+    [('az', 2),
+     ('bz', 2),
+     ('cz', 2)]
 
 For a more in-depth overview, see the "Getting Started" guide.
 
