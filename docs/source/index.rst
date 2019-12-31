@@ -20,15 +20,17 @@ It can be viewed as a combination of syntatic sugar for Python's `itertools <htt
 
 Datapad optimizes for developer happiness by providing an intuitive, consistent, and minimal API to manipulate a wide variety of data.
 
-**Getting Datapad**
+Getting Datapad
+---------------
 
 Install datapad with the following command::
 
     pip install -U datapad
 
-**Exploratory data analysis with Datapad**
+Exploratory data analysis with Datapad
+--------------------------------------
 
-See what you can do with `datapad` in the examples below:
+See what you can do with `datapad` in the examples below.
 
 
 **Count all unique items in a sequence:**
@@ -59,7 +61,7 @@ See what you can do with `datapad` in the examples below:
      {'a': 8, 'b': 12},
      {'a': 10, 'b': 21}]
 
-**Chain together multiple transforms for elements of a sequence:**
+**Chain together multiple transforms for the elements of a sequence:**
 
     >>> import datapad as dp
     >>> data = ['a', 'b', 'b', 'c', 'c', 'c']

@@ -74,7 +74,7 @@ See what you can do with `datapad` in the examples below:
  {'a': 10, 'b': 21}]
 ```
 
-**Chain together multiple transforms for elements of a sequence:**
+**Chain together multiple transforms for the elements of a sequence:**
 
 ```python
 >>> import datapad as dp
