@@ -27,6 +27,7 @@ datapad.Sequence
       ~Sequence.groupby
       ~Sequence.keep_if
       ~Sequence.map
+      ~Sequence.peek
       ~Sequence.pmap
       ~Sequence.reduce
       ~Sequence.shuffle
