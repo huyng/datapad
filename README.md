@@ -15,14 +15,13 @@ Copyright 2019 Huy Nguyen
 
 # Datapad: A Fluent API for Exploratory Data Analysis
 
-[![Build Status](https://travis-ci.org/huyng/datapad.svg?branch=master)](https://travis-ci.org/huyng/datapad)
-[![PyPI version](https://badge.fury.io/py/datapad.svg)](https://badge.fury.io/py/datapad)
-[![Code Coverage](https://codecov.io/gh/huyng/datapad/branch/master/graph/badge.svg)](https://codecov.io/gh/huyng/datapad)
-
 <p align="center">
   <img height="200" src="https://user-images.githubusercontent.com/121183/71599089-4cfe1080-2afe-11ea-8852-81f00ed8c3fa.jpg">
   <br>
+  <a href="https://travis-ci.org/huyng/datapad"><img src="https://travis-ci.org/huyng/datapad.svg?branch=master"></a>
+  <a href="https://badge.fury.io/py/datapad"><img src="https://badge.fury.io/py/datapad.svg"></a>
   <img src="https://img.shields.io/pypi/dm/datapad">
+  <a href="https://codecov.io/gh/huyng/datapad"><img src="https://codecov.io/gh/huyng/datapad/branch/master/graph/badge.svg"></a>
 </p>
 
 Datapad is a Python library for processing sequence and stream data using a [Fluent style API](https://en.wikipedia.org/wiki/Fluent_interface#Python). Data scientists and researchers use it as a lightweight toolset to efficiently explore datasets and to massage data for modeling tasks.
