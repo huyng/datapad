@@ -13,6 +13,13 @@ Copyright 2019 Huy Nguyen
    limitations under the License.
 -->
 
+2019-12-31
+==========
+
+Version: 0.6.4
+
+* added `sequence.peek` to allow you to examine a sequence without consuming it.
+
 2019-12-26
 ==========
 

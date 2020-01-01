@@ -13,6 +13,7 @@
 #    limitations under the License.
 
 import collections
+import itertools as it
 
 
 class Sequence:
@@ -77,9 +78,19 @@ class Sequence:
                 this function will set the first element of the sequence as
                 the initial value.
 
-        >>> seq = Sequence(range(10))
-        >>> seq.reduce(lambda acc, item: acc + item, initial=0)
-        45
+        Examples:
+
+            Reduce with accumulator initialized to first element::
+
+            >>> seq = Sequence(range(3))
+            >>> seq.reduce(lambda acc, item: acc + item)
+            3
+
+            Reduce with accumulator set to a custom initial value::
+
+            >>> seq = Sequence(range(3))
+            >>> seq.reduce(lambda acc, item: acc + item, initial=10)
+            13
         """
 
         # if user provided initial value
@@ -147,10 +158,11 @@ class Sequence:
 
         Examples:
 
-        >>> seq = Sequence(range(5))
-        >>> seq = seq.flatmap(lambda v: [v,v])
-        >>> seq.collect()
-        [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]
+            >>> seq = Sequence(range(5))
+            >>> seq = seq.flatmap(lambda v: [v,v])
+            >>> seq.collect()
+            [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]
+
         """
         def _f(seq):
             for item in seq:
@@ -311,9 +323,21 @@ class Sequence:
         """
         Eagerly returns first element in sequence
 
-        >>> seq = Sequence(range(5))
-        >>> seq.first()
-        0
+        Examples:
+
+            Get first value in sequence::
+
+            >>> seq = Sequence(range(5))
+            >>> seq.first()
+            0
+            >>> seq.first()
+            1
+
+            Calling first on empty sequence returns None::
+
+            >>> seq = Sequence([])
+            >>> seq.first()
+
         """
         items = self.take(1).collect()
         if len(items) == 0:
@@ -325,10 +349,23 @@ class Sequence:
         Concatenates another sequence to the end
         of this sequence
 
-        >>> seq = Sequence(range(5))
-        >>> seq =seq.concat(seq)
-        >>> seq.collect()
-        [0, 1, 2, 3, 4, 0, 1, 2, 3, 4]
+        Examples:
+
+            Concat two sequences together::
+
+            >>> s1 = Sequence(['a', 'b', 'c'])
+            >>> s2 = Sequence(range(3))
+            >>> s3 = s2.concat(s1)
+            >>> s3.collect()
+            [0, 1, 2, 'a', 'b', 'c']
+
+            Concat sequence with itself::
+
+            >>> seq = Sequence(range(5))
+            >>> seq = seq.concat(seq)
+            >>> seq.collect()
+            [0, 1, 2, 3, 4, 0, 1, 2, 3, 4]
+
         """
 
         import itertools as it
@@ -459,6 +496,45 @@ class Sequence:
             return items
         seq = Sequence(_iterable=_f(self._iterable))
         return seq
+
+    def peek(self, count=None):
+        """
+        Returns list of `count` elements without advancing sequence
+        iterator. If count is None, return only the first element.
+
+        WARNING: this function will load up to `count` elements
+        of your sequence into memory.
+
+        Examples:
+
+            Peek at first element (notice iterator does not advance)::
+
+            >>> seq = Sequence(range(10))
+            >>> seq.peek()
+            0
+            >>> seq.peek()
+            0
+
+            Peek at first 3 elements::
+
+            >>> seq = Sequence(range(10))
+            >>> seq.peek(3)
+            [0, 1, 2]
+            >>> seq.peek(3)
+            [0, 1, 2]
+
+        """
+        if count is not None:
+            # take count elements
+            elements = self.take(count).collect()
+
+            # prepend elements onto internal iterable
+            self._iterable = it.chain(elements, self._iterable)
+            return elements
+        else:
+            element = self.first()
+            self._iterable = it.chain([element], self._iterable)
+            return element
 
     def __repr__(self):
         return '<Sequence at %s>' % hex(id(self))
