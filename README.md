@@ -29,7 +29,7 @@ Datapad is a Python library for processing sequence and stream data using a [Flu
 
 It can be viewed as a combination of syntatic sugar for the Python [itertools module](https://docs.python.org/3.8/library/itertools.html) and supercharged tooling for working with [Structured Sequence](https://datapad.readthedocs.io/en/latest/quickstart.html#structured-sequences) data.
 
-[Learn more in Documentation](https://datapad.readthedocs.io/en/latest/)
+[Learn more in Documentation](https://datapad.readthedocs.io/en/latest/quickstart.html)
 
 ---
 
@@ -93,7 +93,7 @@ See what you can do with `datapad` in the examples below.
 
 Check out our documentation below to see what else is possible with Datapad:
 
-**[Documentation](https://datapad.readthedocs.io/en/latest/)**
+**[Documentation](https://datapad.readthedocs.io/en/latest/quickstart.html)**
 
 ---
 
