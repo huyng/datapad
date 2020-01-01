@@ -80,13 +80,13 @@ class Sequence:
 
         Examples:
 
-            Reduce with accumulator initialized to first element::
+            Reduce with accumulator initialized to first element:
 
             >>> seq = Sequence(range(3))
             >>> seq.reduce(lambda acc, item: acc + item)
             3
 
-            Reduce with accumulator set to a custom initial value::
+            Reduce with accumulator set to a custom initial value:
 
             >>> seq = Sequence(range(3))
             >>> seq.reduce(lambda acc, item: acc + item, initial=10)
@@ -325,7 +325,7 @@ class Sequence:
 
         Examples:
 
-            Get first value in sequence::
+            Get first value in sequence:
 
             >>> seq = Sequence(range(5))
             >>> seq.first()
@@ -333,7 +333,7 @@ class Sequence:
             >>> seq.first()
             1
 
-            Calling first on empty sequence returns None::
+            Calling first on empty sequence returns None:
 
             >>> seq = Sequence([])
             >>> seq.first()
@@ -351,7 +351,7 @@ class Sequence:
 
         Examples:
 
-            Concat two sequences together::
+            Concat two sequences together:
 
             >>> s1 = Sequence(['a', 'b', 'c'])
             >>> s2 = Sequence(range(3))
@@ -359,7 +359,7 @@ class Sequence:
             >>> s3.collect()
             [0, 1, 2, 'a', 'b', 'c']
 
-            Concat sequence with itself::
+            Concat sequence with itself:
 
             >>> seq = Sequence(range(5))
             >>> seq = seq.concat(seq)
@@ -507,7 +507,7 @@ class Sequence:
 
         Examples:
 
-            Peek at first element (notice iterator does not advance)::
+            Peek at first element (notice iterator does not advance):
 
             >>> seq = Sequence(range(10))
             >>> seq.peek()
@@ -515,7 +515,7 @@ class Sequence:
             >>> seq.peek()
             0
 
-            Peek at first 3 elements::
+            Peek at first 3 elements:
 
             >>> seq = Sequence(range(10))
             >>> seq.peek(3)
