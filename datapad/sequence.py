@@ -61,6 +61,20 @@ class Sequence:
         seq = Sequence(_iterable=_f(self._iterable))
         return seq
 
+    def join(self, other, key=None, key_a=None, key_b=None, combine=None):
+        '''
+        >>> a = Sequence([
+        ...     {'id': 1, 'name': 'John'},
+        ...     {'id': 2, 'name': 'Nayeon'},
+        ...     {'id': 3, 'name': 'Reza'}
+        ... ])
+        >>> b = Sequence([
+        ...     {'id': 1, 'age': 2},
+        ...     {'id': 2, 'age': 3}
+        ... ])
+        >>> a.join(b, key=None, key_a=None, key_b=None)
+        '''
+
     def reduce(self, fn, initial=None):
         """
         Eagerly apply a function of two arguments cumulatively to the items of a sequence,
@@ -446,13 +460,35 @@ class Sequence:
                 a fully-realized list.
 
 
-        >>> things = [("animal", "lion"), ("plant", "maple tree"), ("animal", "walrus"), ("plant", "grass")]
-        >>> seq = Sequence(things)
-        >>> groups = seq.sort().groupby(key=lambda x: x[0], getter=lambda x: x[1])
-        >>> for key, group in groups:
-        ...     print(key, group)
-        animal ['lion', 'walrus']
-        plant ['grass', 'maple tree']
+        Examples:
+
+            Simple usage:
+
+            >>> from pprint import pprint
+            >>> seq = Sequence(['a', 'b', 'c', 'd', 'a', 'b', 'a', 'd'])
+            >>> res = seq.sort().groupby(key=lambda x: x).collect()
+            >>> res == [
+            ...    ('a', ['a', 'a', 'a']),
+            ...    ('b', ['b', 'b']),
+            ...    ('c', ['c']),
+            ...    ('d', ['d', 'd']),
+            ... ]
+            True
+
+            Grouping with getter function:
+
+            >>> things = [("animal", "lion"),
+            ...           ("plant", "maple tree"),
+            ...           ("animal", "walrus"),
+            ...           ("plant", "grass")]
+            >>> seq = Sequence(things)
+            >>> res = seq.sort().groupby(key=lambda x: x[0], getter=lambda x: x[1]).collect()
+            >>> res == [
+            ...    ('animal', ['lion', 'walrus']),
+            ...    ('plant', ['grass', 'maple tree'])
+            ... ]
+            True
+
         """
         if getter is None:
             def getter(x):
