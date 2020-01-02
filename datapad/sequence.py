@@ -235,9 +235,9 @@ class Sequence:
                 value in sequence.
         Returns:
             Either an integer count or a new sequence of
-            tuples where the first element is the unique value
-            and the second element is the number of times
-            that value appeared in the sequence.
+            tuples where the first value is the unique element
+            and the second value is the number of times
+            that element appeared in the sequence.
 
 
         >>> seq = Sequence(range(5))
@@ -250,14 +250,12 @@ class Sequence:
 
         """
 
-        counter = collections.Counter()
-        for index, item in enumerate(self._iterable):
-            counter[item] += 1
-
         if distinct:
+            counter = collections.Counter()
+            for index, item in enumerate(self._iterable):
+                counter[item] += 1
             return Sequence(_iterable=counter.items())
-        else:
-            return index + 1
+        return self.reduce(lambda acc, _: acc + 1, initial=0)
 
     def distinct(self):
         """

@@ -18,8 +18,18 @@ from . import sequence
 from . import io
 from . import fields
 
+
 def load_tests(loader, tests, ignore):
     tests.addTests(doctest.DocTestSuite(io))
     tests.addTests(doctest.DocTestSuite(sequence))
     tests.addTests(doctest.DocTestSuite(fields))
     return tests
+
+class Tests(unittest.TestCase):
+
+    def test_count(self):
+        seq = sequence.Sequence([
+            {'a': 1},
+            {'b': 2}
+        ])
+        assert seq.count() == 2

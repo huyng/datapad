@@ -13,6 +13,14 @@ Copyright 2019 Huy Nguyen
    limitations under the License.
 -->
 
+2020-01-01
+==========
+
+Version: 0.6.5
+
+* BUGFIX: Fixed bug where `Sequence.count` was throwing error when elements were non-hashable.
+
+
 2019-12-31
 ==========
 
