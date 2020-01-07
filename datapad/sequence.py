@@ -61,19 +61,41 @@ class Sequence:
         seq = Sequence(_iterable=_f(self._iterable))
         return seq
 
-    def join(self, other, key=None, key_a=None, key_b=None, combine=None):
-        '''
-        >>> a = Sequence([
-        ...     {'id': 1, 'name': 'John'},
-        ...     {'id': 2, 'name': 'Nayeon'},
-        ...     {'id': 3, 'name': 'Reza'}
-        ... ])
-        >>> b = Sequence([
-        ...     {'id': 1, 'age': 2},
-        ...     {'id': 2, 'age': 3}
-        ... ])
-        >>> a.join(b, key=None, key_a=None, key_b=None)
-        '''
+    # def join(self, other, key=None, other_key=None, joiner=None):
+    #     '''
+    #     >>> a = Sequence([
+    #     ...     {'id': 1, 'name': 'John'},
+    #     ...     {'id': 2, 'name': 'Nayeon'},
+    #     ...     {'id': 3, 'name': 'Reza'}
+    #     ... ])
+    #     >>> b = Sequence([
+    #     ...     {'id': 1, 'age': 2},
+    #     ...     {'id': 2, 'age': 3}
+    #     ... ])
+    #     >>> res = a.join(b, key=lambda x: x['id']).collect()
+    #     >>> res == [
+    #     ...     ({'id': 1, 'name': 'John'}, {'id': 1, 'age': 2}),
+    #     ...     ({'id': 2, 'name': 'Nayeon'}, {'id': 2, 'age': 3})
+    #     ... ]
+    #     True
+    #     '''
+    #     if key is None:
+    #         key = lambda x: x
+
+    #     a = self.map(lambda x: (key(x), x))
+    #     b = other.map(lambda x: (key(x), x))
+
+    #     a_index = collections.OrderedDict(a)
+    #     b_index = collections.OrderedDict(b)
+
+    #     def _inner_join_iterator(a_index, b_index):
+    #         for k, v_a in a_index.items():
+    #             if k in b_index:
+    #                 v_b = b_index[k]
+    #                 yield (v_a, v_b)
+
+    #     seq = Sequence(_iterable=_inner_join_iterator(a_index, b_index))
+    #     return seq
 
     def reduce(self, fn, initial=None):
         """
@@ -530,6 +552,60 @@ class Sequence:
             return items
         seq = Sequence(_iterable=_f(self._iterable))
         return seq
+
+    def window(self, size, stride=1):
+        """
+        Lazily slides and yields a window of length `size` over sequence.
+        This function will drop any remainder if the sequence ends before
+        the window with `size` has been filled.
+
+        Args:
+            size (int):
+                The window size.
+
+            stride (int):
+                How many elements to skip for each
+                advancement in window position.
+
+        Examples:
+
+            >>> seq = Sequence(range(10))
+            >>> seq.window(3, stride=2).collect()
+            [[0, 1, 2], [2, 3, 4], [4, 5, 6], [6, 7, 8]]
+
+        """
+
+        def _window_iterator(iterable, size, stride):
+            queue = collections.deque(maxlen=size)
+            stride_counter = 0
+            for item in iterable:
+                queue.append(item)
+                stride_counter += 1
+                if len(queue) == size and stride_counter >= stride:
+                    yield list(queue)
+                    stride_counter = 0
+
+        seq = Sequence(_iterable=_window_iterator(self._iterable, size, stride))
+        return seq
+
+    def batch(self, size):
+        """
+        Lazily combines elements in sequence into a list of length `size`.
+        This function will drop any remainder if the sequence ends before
+        the batch with `size` has been reached.
+
+        Args:
+            size (int):
+                The batch size.
+
+        Examples:
+
+            >>> seq = Sequence(range(10))
+            >>> seq.batch(3).collect()
+            [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+
+        """
+        return self.window(size=size, stride=size)
 
     def peek(self, count=None):
         """
