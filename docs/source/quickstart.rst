@@ -164,7 +164,7 @@ To match each element in each sequence to the same ``id``, we can use the :func:
         ({'id': 2, 'name': 'Nayeon'}, {'id': 2, 'age': 3})
     ]
 
-This function uses the ``key`` function ``F.get('id')`` (see :func:`datapad.fields.get` for more details) to match ids in sequence ``a`` to ids in sequence ``b`` and returns a sequence of 2-tuples ``(a, b)``. In this resulting sequence ``a`` is an element in ``seq`` whose ``id`` matched element ``b`` in ``other`` (based on the given field keys).
+This function uses the ``key`` function ``F.get('id')`` (see :func:`datapad.fields.get` for more details) to match ids in sequence ``seq`` and ``other``. The result is a sequence of 2-tuples ``(a, b)`` where  ``a`` is an element in ``seq`` whose ``id`` matched element ``b`` in ``other``.
 
 Note, any non-matching elements are simply discarded. This operation is commonly known in SQL terminology as an `inner` join.
 
