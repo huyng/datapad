@@ -192,8 +192,8 @@ If you'd would like a single, combined, dictionary instead of a sequence of 2-tu
 
 .. _structured-sequences:
 
-Structured sequences
-====================
+Fields and Structured sequences
+===============================
 
 In nontrivial use-cases, `Sequences` are often made up of `Dictionaries`, `Lists`, or other container data-types. Datapad provides a set of functions in the :mod:`datapad.fields` module to work with these nested data types.
 
