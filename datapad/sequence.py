@@ -54,11 +54,11 @@ class Sequence:
         >>> seq.collect()
         [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
         """
-        def _f(seq):
+        def _map(seq):
             for item in seq:
                 yield fn(item)
 
-        seq = Sequence(_iterable=_f(self._iterable))
+        seq = Sequence(_iterable=_map(self._iterable))
         return seq
 
     # def join(self, other, key=None, other_key=None, joiner=None):
@@ -175,11 +175,11 @@ class Sequence:
         pool = ThreadPool(workers)
         apply = pool.imap_unordered if not ordered else pool.imap
 
-        def _f(seq):
+        def _pmap(seq):
             for result in apply(fn, seq):
                 yield result
 
-        seq = Sequence(_iterable=_f(self._iterable))
+        seq = Sequence(_iterable=_pmap(self._iterable))
         return seq
 
     def flatmap(self, fn):
@@ -200,11 +200,13 @@ class Sequence:
             [0, 0, 1, 1, 2, 2, 3, 3, 4, 4]
 
         """
-        def _f(seq):
+
+        def _flatmap(seq):
             for item in seq:
                 for element in fn(item):
                     yield element
-        seq = Sequence(_iterable=_f(self._iterable))
+
+        seq = Sequence(_iterable=_flatmap(self._iterable))
         return seq
 
     def filter(self, fn):
@@ -235,12 +237,13 @@ class Sequence:
         [2, 3, 4]
         """
 
-        def _f(seq):
+        def _keep_if(seq):
             for item in seq:
                 if fn(item) is not True:
                     continue
                 yield item
-        seq = Sequence(_iterable=_f(self._iterable))
+
+        seq = Sequence(_iterable=_keep_if(self._iterable))
         return seq
 
     def drop_if(self, fn):
@@ -328,12 +331,12 @@ class Sequence:
         >>> seq.collect()
         [2, 3, 4]
         """
-        def _f(seq):
+        def _drop(seq):
             for i, item in enumerate(seq):
                 if i >= count:
                     yield item
 
-        seq = Sequence(_iterable=_f(self._iterable))
+        seq = Sequence(_iterable=_drop(self._iterable))
         return seq
 
     def take(self, count):
@@ -344,13 +347,14 @@ class Sequence:
         >>> seq.take(2).collect()
         [0, 1]
         """
-        def _f(seq):
+
+        def _take(seq):
             for i, item in enumerate(seq):
                 yield item
                 if (i + 1) >= count:
                     break
 
-        seq = Sequence(_iterable=_f(self._iterable))
+        seq = Sequence(_iterable=_take(self._iterable))
         return seq
 
     def first(self):
@@ -545,12 +549,13 @@ class Sequence:
         >>> seq.shuffle().collect()
         [2, 1, 0, 4, 3]
         """
-        def _f(iterable):
+        def _shuffle(iterable):
             import random
             items = list(iterable)
             random.shuffle(items)
             return items
-        seq = Sequence(_iterable=_f(self._iterable))
+
+        seq = Sequence(_iterable=_shuffle(self._iterable))
         return seq
 
     def window(self, size, stride=1):
