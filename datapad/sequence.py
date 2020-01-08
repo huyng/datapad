@@ -557,7 +557,7 @@ class Sequence:
         """
         Lazily slides and yields a window of length `size` over sequence.
         This function will drop any remainder if the sequence ends before
-        the window with `size` has been filled.
+        a window with `size` has been filled.
 
         Args:
             size (int):
@@ -622,7 +622,7 @@ class Sequence:
         """
         Lazily combines elements in sequence into a list of length `size`.
         This function will drop any remainder if the sequence ends before
-        the batch with `size` has been reached.
+        a batch with `size` has been created.
 
         Args:
             size (int):
