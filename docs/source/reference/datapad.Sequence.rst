@@ -15,6 +15,7 @@ datapad.Sequence
    
       ~Sequence.__init__
       ~Sequence.all
+      ~Sequence.batch
       ~Sequence.collect
       ~Sequence.concat
       ~Sequence.count
@@ -33,6 +34,7 @@ datapad.Sequence
       ~Sequence.shuffle
       ~Sequence.sort
       ~Sequence.take
+      ~Sequence.window
       ~Sequence.zip_with_index
    
    
