@@ -16,6 +16,13 @@ Copyright 2019 Huy Nguyen
 2020-01-01
 ==========
 
+Version: 0.6.6
+
+* New Features: We added `Sequence.window` and `Sequence.batch` to enable sliding window aggregations and batch aggregations.
+
+2020-01-01
+==========
+
 Version: 0.6.5
 
 * BUGFIX: Fixed bug where `Sequence.count` was throwing error when elements were non-hashable.
