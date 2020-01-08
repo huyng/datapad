@@ -61,41 +61,67 @@ class Sequence:
         seq = Sequence(_iterable=_map(self._iterable))
         return seq
 
-    # def join(self, other, key=None, other_key=None, joiner=None):
-    #     '''
-    #     >>> a = Sequence([
-    #     ...     {'id': 1, 'name': 'John'},
-    #     ...     {'id': 2, 'name': 'Nayeon'},
-    #     ...     {'id': 3, 'name': 'Reza'}
-    #     ... ])
-    #     >>> b = Sequence([
-    #     ...     {'id': 1, 'age': 2},
-    #     ...     {'id': 2, 'age': 3}
-    #     ... ])
-    #     >>> res = a.join(b, key=lambda x: x['id']).collect()
-    #     >>> res == [
-    #     ...     ({'id': 1, 'name': 'John'}, {'id': 1, 'age': 2}),
-    #     ...     ({'id': 2, 'name': 'Nayeon'}, {'id': 2, 'age': 3})
-    #     ... ]
-    #     True
-    #     '''
-    #     if key is None:
-    #         key = lambda x: x
+    def join(self, other, key=None, other_key=None):
+        '''
+        Joins two sequences based on common field matches
+        between the sequence and ``other``. This is known as an "inner"
+        join in SQL terminology.
 
-    #     a = self.map(lambda x: (key(x), x))
-    #     b = other.map(lambda x: (key(x), x))
+        Args:
 
-    #     a_index = collections.OrderedDict(a)
-    #     b_index = collections.OrderedDict(b)
+            other (Sequence):
+                A Sequence to join with the calling sequence.
+            key (function):
+                A function to retrieve the field to be used for matching between the
+                two sequence. If key is None, then ``key`` will default to ``lambda x: x``.
+            other_key (function):
+                A function to retrieve the field in ``other`` to be used for
+                matching between the two sequence. If ``other_key`` is None, use
+                ``key``.
 
-    #     def _inner_join_iterator(a_index, b_index):
-    #         for k, v_a in a_index.items():
-    #             if k in b_index:
-    #                 v_b = b_index[k]
-    #                 yield (v_a, v_b)
+        Returns:
 
-    #     seq = Sequence(_iterable=_inner_join_iterator(a_index, b_index))
-    #     return seq
+            A sequence of 2-tuples ``(a, b)`` where ``a`` is an element in ``self`` that
+            matched element ``b`` in ``other`` (based on the given field keys).
+
+        Examples:
+
+            >>> a = Sequence([
+            ...     {'id': 1, 'name': 'John'},
+            ...     {'id': 2, 'name': 'Nayeon'},
+            ...     {'id': 3, 'name': 'Reza'}
+            ... ])
+            >>> b = Sequence([
+            ...     {'id': 1, 'age': 2},
+            ...     {'id': 2, 'age': 3}
+            ... ])
+            >>> res = a.join(b, key=lambda x: x['id']).collect()
+            >>> res == [
+            ...     ({'id': 1, 'name': 'John'}, {'id': 1, 'age': 2}),
+            ...     ({'id': 2, 'name': 'Nayeon'}, {'id': 2, 'age': 3})
+            ... ]
+            True
+
+        '''
+        if key is None:
+            key = lambda x: x
+        if other_key is None:
+            other_key = key
+
+        def _inner_join_iterator(a, b, a_key, b_key):
+            a_index = a.map(lambda x: (key(x), x))
+            b_index = b.map(lambda x: (other_key(x), x))
+
+            a_index = collections.OrderedDict(a_index)
+            b_index = collections.OrderedDict(b_index)
+
+            for k, v_a in a_index.items():
+                if k in b_index:
+                    v_b = b_index[k]
+                    yield (v_a, v_b)
+
+        seq = Sequence(_iterable=_inner_join_iterator(self, other, key, other_key))
+        return seq
 
     def reduce(self, fn, initial=None):
         """

@@ -13,7 +13,15 @@ Copyright 2019 Huy Nguyen
    limitations under the License.
 -->
 
-2020-01-01
+2020-01-08
+==========
+
+Version: 0.6.7
+
+* New feature: we added `fields.get` to retrieve a specific field in a structured sequence.
+* New feature: We added `Sequence.join` to join together two sequences based on matching keys.
+
+2020-01-07
 ==========
 
 Version: 0.6.6

@@ -389,6 +389,43 @@ def add(*args):
 
     return _function
 
+def get(key, default=None):
+    '''
+    Constructs a function ``F(data)`` to get a field-value given a field-key
+    from a list or dict. If a field-key is not present in data,
+    return ``default`` value. This function is commonly used as
+    a keying-function for ``Sequence.map``, ``Sequence.sort``,
+    ``Sequence.groupby``, and ``Sequence.join``.
+
+    Examples:
+
+        In the examples below, assume ``data`` is an element or row
+        coming from a ``Sequence``.
+
+        >>> F = get('a', 'foobar')
+        >>> F({'a': 1})
+        1
+        >>> F({'b': 2})
+        'foobar'
+
+        >>> F = get(0, "default")
+        >>> F([10])
+        10
+
+        >>> F = get(1, "default")
+        >>> F([10])
+        'default'
+
+    '''
+
+    def _get_function(data):
+        try:
+            return data[key]
+        except (IndexError, KeyError):
+            return default
+
+    return _get_function
+
 
 if __name__ == "__main__":
     import doctest

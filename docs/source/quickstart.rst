@@ -140,6 +140,56 @@ You can find all unique values in a `Sequence` by calling the :func:`~datapad.Se
     ['a', 'b', 'c', 'd']
 
 
+Joining sequences
+-----------------
+
+A common operation needed when working with messy data is to combine multiple sequences together based on a matching field. For example in the sequences below, we a presented with two sequences which are correlated using an ``id`` field. One sequence contains a person's name information and the other contains age information.
+
+To match each element in each sequence to the same ``id``, we can use the :func:`~datapad.Sequence.join` function::
+
+    >>> import datapad.fields as F
+    >>> import datapad as dp
+    >>> seq = dp.Sequence([
+    ...     {'id': 1, 'name': 'John'},
+    ...     {'id': 2, 'name': 'Nayeon'},
+    ...     {'id': 3, 'name': 'Reza'}
+    ... ])
+    >>> other = dp.Sequence([
+    ...     {'id': 1, 'age': 2},
+    ...     {'id': 2, 'age': 3}
+    ... ])
+    >>> seq.join(other, key=F.get('id')).collect()
+    [
+        ({'id': 1, 'name': 'John'}, {'id': 1, 'age': 2}),
+        ({'id': 2, 'name': 'Nayeon'}, {'id': 2, 'age': 3})
+    ]
+
+This function uses the ``key`` function ``F.get('id')`` (see :func:`datapad.fields.get` for more details) to match ids in sequence ``a`` to ids in sequence ``b`` and returns a sequence of 2-tuples ``(a, b)``. In this resulting sequence ``a`` is an element in ``seq`` whose ``id`` matched element ``b`` in ``other`` (based on the given field keys).
+
+Note, any non-matching elements are simply discarded. This operation is commonly known in SQL terminology as an `inner` join.
+
+If you'd would like a single, combined, dictionary instead of a sequence of 2-tuples, you can map a merging function over the resulting sequence::
+
+    >>> import datapad.fields as F
+    >>> import datapad as dp
+    >>> seq = dp.Sequence([
+    ...     {'id': 1, 'name': 'John'},
+    ...     {'id': 2, 'name': 'Nayeon'},
+    ...     {'id': 3, 'name': 'Reza'}
+    ... ])
+    >>> other = dp.Sequence([
+    ...     {'id': 1, 'age': 2},
+    ...     {'id': 2, 'age': 3}
+    ... ])
+    >>> seq.join(other, key=F.get('id'))\
+    ...    .map(lambda d: dict(list(d[0].items()) + list(d[1].items())))\
+    ...    .collect()
+    [
+        ({'id': 1, 'name': 'John',  'age': 2}),
+        ({'id': 2, 'name': 'Nayeon', 'age': 3})
+    ]
+
+
 .. _structured-sequences:
 
 Structured sequences

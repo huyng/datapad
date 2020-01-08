@@ -26,6 +26,7 @@ datapad.Sequence
       ~Sequence.first
       ~Sequence.flatmap
       ~Sequence.groupby
+      ~Sequence.join
       ~Sequence.keep_if
       ~Sequence.map
       ~Sequence.peek
