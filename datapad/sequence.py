@@ -570,22 +570,52 @@ class Sequence:
         Examples:
 
             >>> seq = Sequence(range(10))
+            >>> seq.window(2).collect()
+            [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9]]
+
+            >>> seq = Sequence(range(10))
             >>> seq.window(3, stride=2).collect()
             [[0, 1, 2], [2, 3, 4], [4, 5, 6], [6, 7, 8]]
 
+            >>> seq = Sequence(range(10))
+            >>> seq.window(2, stride=4).collect()
+            [[0, 1], [4, 5], [8, 9]]
+
+            >>> seq = Sequence(range(10))
+            >>> seq.window(1, stride=1).collect()
+            [[0], [1], [2], [3], [4], [5], [6], [7], [8], [9]]
+
         """
+
+        assert stride > 0, "stride must be nonzero"
 
         def _window_iterator(iterable, size, stride):
             queue = collections.deque(maxlen=size)
-            stride_counter = 0
-            for item in iterable:
-                queue.append(item)
-                stride_counter += 1
-                if len(queue) == size and stride_counter >= stride:
-                    yield list(queue)
-                    stride_counter = 0
 
-        seq = Sequence(_iterable=_window_iterator(self._iterable, size, stride))
+            # consume iterable up to size
+            while True:
+
+                try:
+                    element = next(iterable)
+                except StopIteration:
+                    break
+
+                queue.append(element)
+
+                if len(queue) < size:
+                    continue
+                else:
+                    yield list(queue)
+                    break
+
+            windows = 0
+            for element in iterable:
+                windows += 1
+                queue.append(element)
+                if windows % stride == 0:
+                    yield list(queue)
+
+        seq = Sequence(_iterable=_window_iterator(self._iterable, size=size, stride=stride))
         return seq
 
     def batch(self, size):
