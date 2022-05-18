@@ -13,6 +13,12 @@ Copyright 2019 Huy Nguyen
    limitations under the License.
 -->
 
+2022-05-17
+==========
+
+Version: 0.6.8
+* New feature: we added `Sequence.cache` and `Sequence.reset` to allow one to save a sequence and reset it the beginning of the iterator
+
 2020-01-08
 ==========
 
