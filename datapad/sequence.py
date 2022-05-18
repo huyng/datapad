@@ -104,7 +104,9 @@ class Sequence:
 
         '''
         if key is None:
-            key = lambda x: x
+            def key(x):
+                return x
+
         if other_key is None:
             other_key = key
 
@@ -167,6 +169,66 @@ class Sequence:
             acc = fn(acc, item)
 
         return acc
+
+    def cache(self, overwrite=False):
+        """
+        Greedily stores results of self.collect() in an internal variable that can later
+        be used to reset the Sequence to the beginning of the iterator. This is useful
+        if you want to make multiple passes over the data. This function is meant
+        to be used in conjunction with reset().
+
+        Args:
+            overwrite (bool):
+                By default multiple calls to the cache function will only cache the initial
+                state of the iterator. If you set overwrite to True, this will take the current
+                state of the iterator and use it's results to save it to the internal cache.
+
+        >>> seq = Sequence([1,2,3])
+        >>> _ = seq.cache()
+        >>> seq.collect()
+        [1, 2, 3]
+        >>> _ = seq.reset()
+        >>> seq.collect()
+        [1, 2, 3]
+        >>> _ = seq.reset()
+        >>> seq.next()
+        1
+        >>> _ = seq.cache(overwrite=True)
+        >>> seq.collect()
+        [2, 3]
+        >>> _ = seq.reset()
+        >>> seq.collect()
+        [2, 3]
+
+        """
+
+        # Only cache if no cache has been created
+        if (not hasattr(self, "_cache")) or (overwrite is True):
+            import itertools as it
+            orig, copy = it.tee(self._iterable, 2)
+            self._cache = list(copy)
+            self._iterable = orig
+
+        return self
+
+    def reset(self):
+        """
+        Uses the internal cache of the Sequence to reset to beginning of iterator
+
+        >>> seq = Sequence([1, 2, 3])
+        >>> _ = seq.cache()
+        >>> seq.collect()
+        [1, 2, 3]
+        >>> _  = seq.reset()
+        >>> seq.collect()
+        [1, 2, 3]
+
+        """
+        if not hasattr(self, "_cache"):
+            raise Exception("Internal cache has never been created for this Sequence")
+
+        self._iterable = Sequence(_iterable=self._cache)
+        return self
 
     def pmap(self, fn, workers=3, ordered=True):
         """
@@ -408,6 +470,29 @@ class Sequence:
             return None
         return items[0]
 
+    def next(self):
+        """
+        Eagerly returns next element in sequence (alias for first() function)
+
+         Examples:
+
+            Get next value in sequence:
+
+            >>> seq = Sequence(range(5))
+            >>> seq.next()
+            0
+            >>> seq.next()
+            1
+
+            Calling next on empty sequence returns None:
+
+            >>> seq = Sequence([])
+            >>> seq.next()
+
+
+        """
+        return self.first()
+
     def concat(self, seq):
         """
         Concatenates another sequence to the end
@@ -469,15 +554,36 @@ class Sequence:
 
         return self.all()
 
-    def collect(self):
+    def collect(self, reset=False):
         """
         Eagerly returns all elements in sequence
+
+        Args:
+            reset (bool):
+                If set to True, calls .reset() on Sequence to reset the
+                Sequence to the beginning of the iterator if previously
+                cached. This allows to repeatedly call collect without
+                consuming the sequence.
 
         >>> seq = Sequence(range(10))
         >>> seq.collect()
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+        >>> seq = Sequence(range(10))
+        >>> _ = seq.cache()
+        >>> seq.collect(reset=True)
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        >>> seq.collect()
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        >>> seq.collect()
+        []
+
         """
-        return list(self.all())
+        result = list(self.all())
+        if reset:
+            self.reset()
+
+        return result
 
     def sort(self, key=None):
         """
