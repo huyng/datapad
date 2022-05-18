@@ -1,7 +1,11 @@
-datapad.io
+﻿datapad.io
 ==========
 
 .. automodule:: datapad.io
+
+   
+   
+   
 
    
    
@@ -22,3 +26,6 @@ datapad.io
    
    
    
+
+
+
