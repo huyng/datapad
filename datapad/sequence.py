@@ -554,25 +554,11 @@ class Sequence:
 
         return self.all()
 
-    def collect(self, reset=False):
+    def collect(self):
         """
         Eagerly returns all elements in sequence
 
-        Args:
-            reset (bool):
-                If set to True, calls .reset() on Sequence to reset the
-                Sequence to the beginning of the iterator if previously
-                cached. This allows to repeatedly call collect without
-                consuming the sequence.
-
         >>> seq = Sequence(range(10))
-        >>> seq.collect()
-        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-
-        >>> seq = Sequence(range(10))
-        >>> _ = seq.cache()
-        >>> seq.collect(reset=True)
-        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         >>> seq.collect()
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         >>> seq.collect()
@@ -580,9 +566,6 @@ class Sequence:
 
         """
         result = list(self.all())
-        if reset:
-            self.reset()
-
         return result
 
     def sort(self, key=None):
