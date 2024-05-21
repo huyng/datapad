@@ -1,2 +1,2 @@
-pytest --doctest-modules
-pytest datapad/tests.py
+pytest --doctest-modules -v
+pytest datapad/tests.py -v

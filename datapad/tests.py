@@ -53,6 +53,21 @@ class TestSinks(unittest.TestCase):
             seq = sequence.Sequence([1, 2, 3, 4, 5])
             seq.dump(sink)
 
+    def test_text_sink(self):
+        from tempfile import NamedTemporaryFile
+
+        with NamedTemporaryFile(delete=False) as fh:
+            sink = io.TextSink(fh.name)
+            seq = sequence.Sequence([1, 2, 3, 4, 5])
+            seq.dump(sink)
+
+            fh.seek(0)
+            print(fh.read())
+
+            sink = io.TextSink(fh.name, append=True)
+            seq = sequence.Sequence([1, 2, 3, 4, 5])
+            seq.dump(sink)
+
 
 def example_processing_fn(v):
     return v*2

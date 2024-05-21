@@ -167,7 +167,7 @@ class JsonSink:
                  ignore_errors: bool = False,
                  verbose: bool = True):
         """
-        A JSON writer
+        A JSON sink for JSON writing
 
         Args:
             path: str
@@ -222,6 +222,44 @@ class JsonSink:
                 for i, elem in enumerate(seq):
                     j = json.dumps(elem)
                     fh.write(j+'\n')
+
+        if self.verbose:
+            print("")
+
+
+class TextSink:
+    def __init__(self,
+                 path: str,
+                 append: bool = False,
+                 verbose: bool = True):
+        """
+        A Text sink for writing lines of strings to a textfile
+
+        Args:
+            path: str
+                A path to the text file you want to write
+            append: bool (default: False)
+                If True, append to the target file rather than
+                overwriting target file if it already exists.
+            verbose: bool (default: True)
+                If True, report number of records processed
+        """
+        self.path = path
+        self.append = append
+        self.verbose = verbose
+
+    def __call__(self, seq):
+        # re-assign seq, so that it produces a progress output
+        # if user requests
+        if self.verbose:
+            seq = seq.progress()
+
+        mode = "a" if self.append else "w"
+        with open(self.path, mode) as fh:
+
+            # begin writing json
+            for elem in seq:
+                fh.write(str(elem) + '\n')
 
         if self.verbose:
             print("")
