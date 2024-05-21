@@ -25,6 +25,7 @@ def load_tests(loader, tests, ignore):
     tests.addTests(doctest.DocTestSuite(fields))
     return tests
 
+
 class Tests(unittest.TestCase):
 
     def test_count(self):
@@ -33,3 +34,22 @@ class Tests(unittest.TestCase):
             {'b': 2}
         ])
         assert seq.count() == 2
+
+
+class TestSinks(unittest.TestCase):
+
+    def test_json_sink(self):
+        from tempfile import NamedTemporaryFile
+
+        with NamedTemporaryFile(delete=False) as fh:
+            sink = io.JsonSink(fh.name, lines=True)
+            seq = sequence.Sequence([1, 2, 3, 4, 5])
+            seq.dump(sink)
+
+            fh.seek(0)
+            print(fh.read())
+
+            sink = io.JsonSink(fh.name, append=True, lines=True)
+            seq = sequence.Sequence([1, 2, 3, 4, 5])
+            seq.dump(sink)
+

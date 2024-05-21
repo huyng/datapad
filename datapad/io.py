@@ -18,6 +18,7 @@ Convenience functions for creating Sequences from files and other input sources.
 
 from .sequence import Sequence
 
+
 def _from_glob_paths(path_or_paths):
     """
     Construct a Sequence from file glob patterns
@@ -152,6 +153,78 @@ def read_csv(path_or_paths):
     seq = _from_glob_paths(path_or_paths)
     seq = seq.flatmap(_read)
     return seq
+
+
+# ------------------------------------------------
+# Sinks Are Callables that will consume a sequence
+# ------------------------------------------------
+
+class JsonSink:
+    def __init__(self,
+                 path: str,
+                 lines: bool = True,
+                 append: bool = False,
+                 ignore_errors: bool = False,
+                 verbose: bool = True):
+        """
+        A JSON writer
+
+        Args:
+            path: str
+                A path to the JSON file you want to write
+            lines: bool (default: True)
+                If True, each element of the sequence comes will be encoded
+                and written to a single line to the json-lines text file
+                (see: http://jsonlines.org/examples/).  If False, aggregate
+                the entire sequence into a single array and write array to the
+                target file path.
+            append: bool (default: False)
+                If True, append to the target file rather than overwriting target
+                file if it already exists.
+            ignore_errors: bool (default: False)
+                If True, ignore and skip over any elements that present json
+                encoding errors
+            verbose: bool (default: True)
+                If True, report number of records processed
+        """
+
+        self.lines = lines
+        self.path = path
+        self.ignore_errors = ignore_errors
+        self.append = append
+        self.verbose = verbose
+
+    def __call__(self, seq):
+        import json
+
+        # re-assign seq, so that it produces a progress output
+        if self.verbose:
+            seq = seq.progress()
+
+        mode = "a" if self.append else "w"
+        with open(self.path, mode) as fh:
+
+            # if not json lines format, just write entire file
+            # as a aggregated list
+            if not self.lines:
+                json.dump(seq.collect(), fh)
+                return
+
+            # begin writing json
+            if self.ignore_errors:
+                for i, elem in enumerate(seq):
+                    try:
+                        j = json.dumps(elem)
+                        fh.write(j+'\n')
+                    except Exception:
+                        continue
+            else:
+                for i, elem in enumerate(seq):
+                    j = json.dumps(elem)
+                    fh.write(j+'\n')
+
+        if self.verbose:
+            print("")
 
 
 if __name__ == "__main__":

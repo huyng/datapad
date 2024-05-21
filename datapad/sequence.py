@@ -122,7 +122,8 @@ class Sequence:
                     v_b = b_index[k]
                     yield (v_a, v_b)
 
-        seq = Sequence(_iterable=_inner_join_iterator(self, other, key, other_key))
+        seq = Sequence(_iterable=_inner_join_iterator(self, other, key,
+                                                      other_key))
         return seq
 
     def reduce(self, fn, initial=None):
@@ -225,7 +226,8 @@ class Sequence:
 
         """
         if not hasattr(self, "_cache"):
-            raise Exception("Internal cache has never been created for this Sequence")
+            raise Exception(
+                "Internal cache has never been created for this Sequence")
 
         self._iterable = Sequence(_iterable=self._cache)
         return self
@@ -735,7 +737,8 @@ class Sequence:
                 if windows % stride == 0:
                     yield list(queue)
 
-        seq = Sequence(_iterable=_window_iterator(self._iterable, size=size, stride=stride))
+        seq = Sequence(_iterable=_window_iterator(
+            self._iterable, size=size, stride=stride))
         return seq
 
     def batch(self, size):
@@ -795,6 +798,48 @@ class Sequence:
             element = self.first()
             self._iterable = it.chain([element], self._iterable)
             return element
+
+    def progress(self):
+        """
+        Output progess and transparently pass through elements
+        of sequence.
+
+        >>> seq = Sequence(range(1000))
+        >>> _ = seq.map(lambda x: x*2).progress().collect()
+        """
+
+        def _report(iterable):
+            import time
+            import sys
+            t0 = time.time()
+            for i, elem in enumerate(iterable):
+                yield elem
+                t1 = time.time()
+                print('- secs/element: %.6fs, processed: %d' %
+                      ((t1-t0)/(i+1), (i+1)), end='\r', file=sys.stderr)
+
+            print("", file=sys.stderr)
+            print('- total time: %.3fs' % (time.time()-t0), file=sys.stderr)
+
+        seq = Sequence(_iterable=_report(self._iterable))
+        return seq
+
+    def dump(self, sink):
+        """
+        Dump sequence into a sink function that will greedily consume
+        elements. The purpose of this function is mainly to be used as
+        a way to write files or other external system output.
+
+        Args:
+            sink:
+                Any callable that will take a sequence to
+                consume as its first argument.
+
+        >>> sink = dp.io.JsonSink("data.jsonl", lines=True) # doctest: +SKIP
+        >>> seq.dump(sink) # doctest: +SKIP
+        """
+
+        return sink(self)
 
     def __repr__(self):
         return '<Sequence at %s>' % hex(id(self))

@@ -61,7 +61,7 @@ See what you can do with `datapad` in the examples below.
 
 ```python
 >>> import datapad as dp
->>> import datapad.fields as F
+>>> F = datapad.fields
 >>> data = [
 ...     {'a': 1, 'b': 2},
 ...     {'a': 4, 'b': 4},
@@ -105,3 +105,9 @@ This project incorporates ideas from:
 * [Pandas](https://pandas.pydata.org/)
 * [Dask](https://dask.org/)
 * [Tensorflow tf.data.Datasets](https://www.tensorflow.org/api_docs/python/tf/data/Dataset)
+
+### Development
+
+```
+python setup.py test
+```
