@@ -53,3 +53,21 @@ class TestSinks(unittest.TestCase):
             seq = sequence.Sequence([1, 2, 3, 4, 5])
             seq.dump(sink)
 
+
+def example_processing_fn(v):
+    return v*2
+
+
+def test_pmap():
+
+    # test thread-based parallel map
+    seq = sequence.Sequence(range(1000))
+    results = seq.pmap(lambda v: v*2, workers=4).collect()
+    assert results == [v*2 for v in range(1000)], results
+
+    # test process-based parallel map
+    seq = sequence.Sequence(range(1000))
+    results = seq.pmap(example_processing_fn,
+                       workers=4,
+                       wtype="process").collect()
+    assert results == [v*2 for v in range(1000)], results

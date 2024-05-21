@@ -97,17 +97,11 @@ Check out our documentation below to see what else is possible with Datapad:
 
 ---
 
-This project incorporates ideas from:
-
-* [LINQ](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/standard-query-operators-overview)
-* [Spark](https://spark.apache.org/)
-* [Python Itertools](https://docs.python.org/3/library/itertools.html)
-* [Pandas](https://pandas.pydata.org/)
-* [Dask](https://dask.org/)
-* [Tensorflow tf.data.Datasets](https://www.tensorflow.org/api_docs/python/tf/data/Dataset)
-
 ### Development
 
+Run tests from the root of repo using
+
 ```
-python setup.py test
+pip install pytest
+sh test.sh
 ```

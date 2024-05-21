@@ -232,24 +232,32 @@ class Sequence:
         self._iterable = Sequence(_iterable=self._cache)
         return self
 
-    def pmap(self, fn, workers=3, ordered=True):
+    def pmap(self, fn, workers=3, ordered=True, wtype="thread"):
         """
-        Lazily apply fn function to every element of iterable, in parallel using
-        multiprocess.dummy.Pool . The returned sequence may appear in a
-        different order than the input sequence if you set `ordered` to False
-
-        THIS FUNCTION IS EXPERIMENTAL
+        Lazily apply fn function to every element of iterable, in
+        parallel using python's multiprocessing package. The returned
+        sequence may appear in a different order than the input
+        sequence if you set `ordered` to False.
 
         Args:
             fn (function):
-                Function with signature fn(element) -> element to apply to every
-                element of sequence.
+                Function with signature fn(element) -> element to apply to
+                every element of sequence.
             workers (int):
                 Number of parallel workers to use (default: 3). These
                 workers are implemented as python threads.
             ordered (bool):
                 Whether to yield results in the same order in which items
-                arrive. You may get better performance by setting this to false (default: True).
+                arrive. You may get better performance by setting this to
+                false (default: True).
+            wtype ("thread" | "process"):
+                The worker type to use (default: "thread"). Please
+                note, if you are using "process", any functions passed
+                to pmap must be defined concretely inside your script.
+                lambda functions can not be used due to limitations of
+                python multiprocess pickling. The worker type "thread"
+                is good for use with io-bound tasks (such as reading data)
+                from urls.
 
         >>> seq = Sequence(range(10))
         >>> seq = seq.pmap(lambda v: v*2)
@@ -260,16 +268,26 @@ class Sequence:
         >>> seq = seq.pmap(lambda v: v*2, workers=1, ordered=False)
         >>> seq.collect()
         [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
+
         """
+
         from multiprocessing.dummy import Pool as ThreadPool
-        pool = ThreadPool(workers)
-        apply = pool.imap_unordered if not ordered else pool.imap
+        from multiprocessing import Pool as ProcessPool
 
-        def _pmap(seq):
-            for result in apply(fn, seq):
-                yield result
+        def _pmap(seq, fn):
+            if wtype == "process":
+                Pool = ProcessPool
+            elif wtype == "thread":
+                Pool = ThreadPool
+            else:
+                raise Exception("Unknown worker type '%s'" % wtype)
 
-        seq = Sequence(_iterable=_pmap(self._iterable))
+            with Pool(workers) as pool:
+                apply = pool.imap_unordered if not ordered else pool.imap
+                for result in apply(fn, seq):
+                    yield result
+
+        seq = Sequence(_iterable=_pmap(self._iterable, fn))
         return seq
 
     def flatmap(self, fn):
