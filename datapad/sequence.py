@@ -830,14 +830,24 @@ class Sequence:
             import time
             import sys
             t0 = time.time()
+            t_interval = 0
+            i = 0
             for i, elem in enumerate(iterable):
                 yield elem
-                t1 = time.time()
-                print('- secs/element: %.6fs, processed: %d' %
-                      ((t1-t0)/(i+1), (i+1)), end='\r', file=sys.stderr)
+                t_interval = time.time() - t0
+
+                # only print if time interval has elapse more 300 ms to
+                # avoid oversaturating outputs.
+                if t_interval > .300:
+                    print('- secs/element: %.6fs, processed: %d' %
+                          (t_interval/(i+1), i+1),
+                          end='\r',
+                          file=sys.stderr)
 
             print("", file=sys.stderr)
-            print('- total time: %.3fs' % (time.time()-t0), file=sys.stderr)
+            print('- total time: %.3fs, processed: %d' %
+                  (t_interval, i),
+                  file=sys.stderr)
 
         seq = Sequence(_iterable=_report(self._iterable))
         return seq
