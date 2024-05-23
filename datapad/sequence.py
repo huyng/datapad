@@ -417,7 +417,7 @@ class Sequence:
 
     def zip_with_index(self):
         """
-        Add an to each item in sequence
+        Add an index to each item in sequence (e.g. enumerate)
 
         >>> seq = Sequence(['a', 'b', 'c'])
         >>> seq.zip_with_index().collect()
@@ -588,7 +588,7 @@ class Sequence:
         result = list(self.all())
         return result
 
-    def sort(self, key=None):
+    def sort(self, key=None, reverse=False):
         """
         Eagerly sorts your sequence and returns a
         newly created sequence containing the sorted items.
@@ -599,7 +599,8 @@ class Sequence:
         >>> seq.sort().collect()
         [0, 1, 2, 3, 4]
         """
-        seq = Sequence(_iterable=sorted(list(self._iterable), key=key))
+        seq = Sequence(_iterable=sorted(
+            list(self._iterable), key=key, reverse=reverse))
         return seq
 
     def groupby(self, key=None, getter=None, eager_group=True):
@@ -829,24 +830,29 @@ class Sequence:
         def _report(iterable):
             import time
             import sys
+
             t0 = time.time()
-            t_interval = 0
+            t_interval_avg = 0
+            t_last_print = time.time()
             i = 0
+
             for i, elem in enumerate(iterable):
                 yield elem
-                t_interval = time.time() - t0
 
                 # only print if time interval has elapse more 300 ms to
-                # avoid oversaturating outputs.
-                if t_interval > .300:
+                # avoid oversaturating output.
+                t1 = time.time()
+                if (t1 - t_last_print) > .300:
+                    t_interval_avg = (t1 - t0)/(i+1)
+                    t_last_print = t1
                     print('- secs/element: %.6fs, processed: %d' %
-                          (t_interval/(i+1), i+1),
+                          (t_interval_avg, i+1),
                           end='\r',
                           file=sys.stderr)
 
             print("", file=sys.stderr)
             print('- total time: %.3fs, processed: %d' %
-                  (t_interval, i),
+                  (t_interval_avg, i),
                   file=sys.stderr)
 
         seq = Sequence(_iterable=_report(self._iterable))
@@ -872,6 +878,9 @@ class Sequence:
     def __repr__(self):
         return '<Sequence at %s>' % hex(id(self))
 
+
+# syntatic sugar so one can do dp.Seq
+Seq = Sequence
 
 if __name__ == "__main__":
     import doctest

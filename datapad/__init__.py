@@ -14,4 +14,4 @@
 
 from . import io
 from . import fields
-from .sequence import Sequence
+from .sequence import Sequence, Seq

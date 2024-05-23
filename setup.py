@@ -13,14 +13,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from os import path
+from setuptools import setup
 import os
 os.environ['NOSE_DOCTEST_EXTENSION'] = 'txt'
 os.environ['NOSE_WITH_DOCTEST'] = 'True'
 os.environ['NOSE_WITH_DOCTESTS'] = 'True'
-from setuptools import setup
+
 
 # read the contents of your README file
-from os import path
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
@@ -28,12 +29,12 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='datapad',
-    version='0.7.3',
+    version='0.7.4',
     description='Datapad is a library of lazy data transformations for sequences; similar to spark and linq',
     long_description=long_description,
     long_description_content_type='text/markdown',
     author='Huy Nguyen',
     author_email='',
     url='https://github.com/huyng/datapad',
-    packages=['datapad'],
+    packages=['datapad']
 )
