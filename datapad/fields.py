@@ -18,6 +18,7 @@ These functions are often used in conjunction with the :func:`datapad.Sequence.m
 manipulate structured sequences.
 """
 
+
 def asdict(keys=None):
     '''
     Constructs a function that will convert a list into a dict using the given
@@ -244,7 +245,8 @@ def apply(*args):
         func = args[1]
         funcs = {key: func}
     else:
-        raise ValueError('Please call add with one of the following signtures: (Function), (Str, Function), (List[Function]), or (Dict[Str, Function])')
+        raise ValueError(
+            'Please call add with one of the following signtures: (Function), (Str, Function), (List[Function]), or (Dict[Str, Function])')
 
     # convert funcs to a dict if passed in as a list
     if isinstance(funcs, list):
@@ -252,25 +254,34 @@ def apply(*args):
 
     def _function(data):
 
-        if isinstance(data, list):
+        if isinstance(data, (list, tuple)):
             new_data = []
             for key, value in enumerate(data):
-                if not isinstance(funcs, (list, dict)):
-                    f = funcs
-                    new_data.append(f(value))
-                elif key not in funcs:
-                    new_data.append(value)
+                if isinstance(funcs, (list, tuple)):
+                    if key < len(funcs):
+                        f = funcs[key]
+                        new_data.append(f(value))
+                    else:
+                        new_data.append(value)
+                elif isinstance(funcs, dict):
+                    if key in funcs:
+                        f = funcs[key]
+                        new_data.append(f(value))
+                    else:
+                        new_data.append(value)
                 else:
-                    f = funcs[key]
+                    f = funcs
                     new_data.append(f(value))
 
         elif isinstance(data, dict):
             new_data = {}
             for key, value in data.items():
-                if not isinstance(funcs, (list, dict)):
+                if not isinstance(funcs, (list, tuple, dict)):
                     f = funcs
-                    new_data[data] = f(value)
-                elif key not in funcs:
+                    new_data[key] = f(value)
+                elif isinstance(funcs, dict) and key not in funcs:
+                    new_data[key] = value
+                elif isinstance(funcs, (list, tuple)) and key > len(funcs):
                     new_data[key] = value
                 else:
                     f = funcs[key]
@@ -371,7 +382,8 @@ def add(*args):
         func = args[1]
         funcs = {key: func}
     else:
-        raise ValueError('Please call add with one of the following signtures: (Function), (Str, Function), (List[Function]), or (Dict[Str, Function])')
+        raise ValueError(
+            'Please call add with one of the following signtures: (Function), (Str, Function), (List[Function]), or (Dict[Str, Function])')
 
     def _function(data):
         if isinstance(data, list):
@@ -388,6 +400,7 @@ def add(*args):
             return new_data
 
     return _function
+
 
 def get(key, default=None):
     '''
