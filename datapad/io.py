@@ -160,6 +160,7 @@ def read_csv(path_or_paths):
 # ------------------------------------------------
 
 class JsonSink:
+
     def __init__(self,
                  path: str,
                  lines: bool = True,
@@ -263,6 +264,35 @@ class TextSink:
 
         if self.verbose:
             print("")
+
+
+class SqliteSink:
+
+    def __init__(self,
+                 path: str,
+                 table: str):
+        """
+        Sqlite sink for writing data to a table
+
+        Argumetns:
+            path: str
+                Path to the sqlite database file
+                (e.g. "/tmp/data.sqlitel")
+            table: str
+                Name of the table to insert the data
+                into. If it doesn't exist, the table
+                will be created and column types will
+                be infered. Warning this will modify
+                table type declartions.
+        """
+        self.path = path
+        self.table = table
+
+    def __call__(self, seq: Sequence):
+        from sqlite_utils import Database
+        db = Database(self.path)
+        table = db[self.table]
+        table.insert_all(seq, alter=True)
 
 
 if __name__ == "__main__":
