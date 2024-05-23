@@ -86,3 +86,19 @@ def test_pmap():
                        workers=4,
                        wtype="process").collect()
     assert results == [v*2 for v in range(1000)], results
+
+
+def test_field_apply():
+
+    # test tuple input
+    a = (1, 2, 3, 4, 5)
+    func = fields.apply((lambda x: x*2, lambda x: x**2))
+    result = func(a)
+    assert result == [2, 4, 3, 4, 5]
+
+    # test tuple input dict funcs
+    a = (1, 2, 3, 4, 5)
+    func = fields.apply({3: lambda x: x*2,
+                         1: lambda x: x**2})
+    result = func(a)
+    assert result == [1, 4, 3, 8, 5]

@@ -12,16 +12,18 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from typing import Callable, Iterable, Union
 import collections
 import itertools as it
 
 
 class Sequence:
     """
-    The core object in datapad used to wrap sequence-like data types in a fluent-style API.
+    The core object in datapad used to wrap sequence-like
+    data types in a fluent-style API.
     """
 
-    def __init__(self, _iterable=None):
+    def __init__(self, _iterable: Union[Iterable, None] = None):
         """
         Instantiates a new Sequence object.
 
@@ -292,13 +294,13 @@ class Sequence:
 
     def flatmap(self, fn):
         """
-        Lazily apply fn function to every element of iterable and chain the output
-        into a single flattend sequence.
+        Lazily apply fn function to every element of iterable and chain the
+        output into a single flattend sequence.
 
         Args:
             fn (function):
-                Function with signature fn(element) -> iterable(element) to apply to every
-                element of sequence.
+                Function with signature fn(element) -> iterable(element) to
+                apply to every element of sequence.
 
         Examples:
 
@@ -588,7 +590,9 @@ class Sequence:
         result = list(self.all())
         return result
 
-    def sort(self, key=None, reverse=False):
+    def sort(self,
+             key: Union[Callable, None] = None,
+             reverse=False):
         """
         Eagerly sorts your sequence and returns a
         newly created sequence containing the sorted items.
@@ -599,8 +603,9 @@ class Sequence:
         >>> seq.sort().collect()
         [0, 1, 2, 3, 4]
         """
-        seq = Sequence(_iterable=sorted(
-            list(self._iterable), key=key, reverse=reverse))
+
+        arr = sorted(self, key=key, reverse=reverse)
+        seq = Sequence(_iterable=arr)
         return seq
 
     def groupby(self, key=None, getter=None, eager_group=True):
@@ -852,17 +857,60 @@ class Sequence:
 
             print("", file=sys.stderr)
             print('- total time: %.3fs, processed: %d' %
-                  (t_interval_avg, i),
+                  (time.time()-t0, i),
                   file=sys.stderr)
 
         seq = Sequence(_iterable=_report(self._iterable))
         return seq
 
-    def dump(self, sink):
+    def pipe(self,
+             pipe: Callable[['Sequence'],
+                            Union['Sequence', Iterable]]
+             ) -> 'Sequence':
+        """
+        Pass sequence to a function that will iterate over each
+        element in the sequence and return another sequence. This
+        is often used to abstract out complicated sequence processing
+        pipelines into sub-units or to re-use previously defined
+        python iteration functions.
+
+        Args:
+            pipe:
+                The function MUST return another Sequence or
+                an iterable.
+
+
+        >>> def p1(seq):
+        ...     for elem in seq:
+        ...         yield elem*2
+        >>> s = Sequence([1,2,3,4,5]).pipe(p1).collect()
+        >>> s
+        [2, 4, 6, 8, 10]
+
+        >>> def p2(seq):
+        ...     return seq.flatmap(lambda v: v)\
+                          .map(lambda v: v*2)\
+                          .batch(2)
+        >>> s = Sequence([[1, 2, 3, 4, 5, 6]]).pipe(p2).collect()
+        >>> s
+        [[2, 4], [6, 8],  [10, 12]]
+        """
+
+        r = pipe(self)
+
+        if isinstance(r, Sequence):
+            return r
+        elif isinstance(r, Iterable):
+            return Sequence(_iterable=r)
+        else:
+            raise TypeError("pipe must return Sequence or Iterable")
+
+    def dump(self, sink: Callable):
         """
         Dump sequence into a sink function that will greedily consume
         elements. The purpose of this function is mainly to be used as
-        a way to write files or other external system output.
+        a way to push sequence elements to file writers or other
+        external systems.
 
         Args:
             sink:
