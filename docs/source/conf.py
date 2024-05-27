@@ -55,7 +55,7 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'renku'
+html_theme = 'furo'
 html_permalinks_icon = '<span>#</span>'
 # html_theme = 'sphinxawesome_theme'
 # extensions += ["sphinxawesome_theme.highlighting"]
