@@ -160,6 +160,10 @@ def read_csv(path_or_paths):
 # ------------------------------------------------
 
 class JsonSink:
+    """
+    A JSON sink for JSON writing
+    """
+
 
     def __init__(self,
                  path: str,
@@ -229,6 +233,10 @@ class JsonSink:
 
 
 class TextSink:
+    """
+    A Text sink for writing lines of strings to a textfile
+    """
+
     def __init__(self,
                  path: str,
                  append: bool = False,
@@ -267,6 +275,9 @@ class TextSink:
 
 
 class SqliteSink:
+    """
+    Sqlite sink for writing data to a table
+    """
 
     def __init__(self,
                  path: str,

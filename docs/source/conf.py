@@ -38,7 +38,7 @@ extensions = [
     'sphinx.ext.napoleon'
 ]
 
-autodoc_default_flags = ['members']
+autodoc_default_flags = ['members', 'classes', 'functions', 'methods']
 autosummary_generate = True
 
 # Add any paths that contain templates here, relative to this directory.
@@ -55,7 +55,15 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'renku'
+html_permalinks_icon = '<span>#</span>'
+# html_theme = 'sphinxawesome_theme'
+# extensions += ["sphinxawesome_theme.highlighting"]
+
+
+html_css_files = [
+    'css/custom.css',
+]
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

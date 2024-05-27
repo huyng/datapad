@@ -2,9 +2,10 @@
 API Reference
 =============
 
+
 .. autosummary::
     :toctree: reference
-    :nosignatures:
+    :recursive:
 
     datapad.Sequence
     datapad.fields

@@ -1,33 +1,39 @@
-﻿datapad.fields
+﻿..
+  module.rst
+
+datapad.fields
 ==============
 
 .. automodule:: datapad.fields
 
-   
-   
-   
+    
+        
+    
 
-   
-   
-   .. rubric:: Functions
+    
+        
+            .. rubric:: Functions
 
-   .. autosummary::
-   
-      add
-      apply
-      asdict
-      get
-      select
-   
-   
+            .. autosummary::
+                :toctree:
+                :nosignatures:
+                :template: autosummary/base.rst
+                
+                    add
+                    apply
+                    asdict
+                    get
+                    select
+        
+    
 
-   
-   
-   
+    
+        
+    
 
-   
-   
-   
+    
+        
+    
 
 
-
+    
