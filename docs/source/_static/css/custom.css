@@ -1,3 +1,6 @@
 .highlight pre {
     padding-left: 1rem !important;
 }
+html {
+    font-size: 15px;
+}
