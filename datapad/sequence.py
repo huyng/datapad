@@ -892,7 +892,7 @@ class Sequence:
                           .batch(2)
         >>> s = Sequence([[1, 2, 3, 4, 5, 6]]).pipe(p2).collect()
         >>> s
-        [[2, 4], [6, 8],  [10, 12]]
+        [[2, 4], [6, 8], [10, 12]]
         """
 
         r = pipe(self)
