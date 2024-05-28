@@ -5,15 +5,15 @@ Getting started
 Overview
 ========
 
-The central class in `datapad` is :class:`datapad.Sequence` . This class provides an intuitive API for manipulating any sequence-like object using `fluent programming <https://en.wikipedia.org/wiki/Fluent_interface>`_. You can wrap python `lists`, `iterators`, `sets`, and `tuples` with this class to get access to all of the fluent-style APIs.
+The central class in `datapad` is :class:`~datapad.Sequence` . This class provides an intuitive API for manipulating any sequence-like object using `fluent programming <https://en.wikipedia.org/wiki/Fluent_interface>`_. You can wrap python `lists`, `iterators`, `sets`, and `tuples` with this class to get access to all of the fluent-style APIs.
 
 Let's begin by importing datapad::
 
     >>> import datapad as dp
 
 
-Creating Sequences
-==================
+Working with Sequences
+======================
 
 Creating a sequence is as simple as instantiating the `Sequence` class with any iterable data type. In the example below, we wrap a range iterator using the `Sequence` class::
 
@@ -21,25 +21,39 @@ Creating a sequence is as simple as instantiating the `Sequence` class with any 
     >>> seq
     <Sequence at 0x102983a5>
 
-By default, `Sequences` are "lazily" evaluated. This means a sequence will only return data when a result is requested. To evaluate a sequence to get a result, call the `collect` method::
+By default,  :class:`~datapad.Sequence` is "lazily" evaluated. This means a sequence will only return data when a result is requested. To evaluate a sequence to get a result, call the :func:`~datapad.Sequence.collect` method::
 
     >>> seq = dp.Sequence(range(10))
     >>> seq.collect()
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-Examining sequences
-===================
+Most methods in :class:`~datapad.Sequence` are "chainable" (unless stated otherwise). That means the methods themselves return another :class:`~datapad.Sequence` object allowing you to easily chain multiple operations together like so::
+
+    >>> seq = dp.Sequence(range(100))\
+    ...         .map(lambda v: v*2)\
+    ...         .keep_if(lambda v: (v%3) == 0))
+    ...         .take(4)
+    >>> seq.collect()
+    [6, 12, 18, 24]
+
+All :class:`~datapad.Sequence` objects conform to Python's iterator api, so you can manually iterate over them if you want to using a simple for-loop:
+
+    >>> seq = dp.Sequence(range(10))
+    >>> for elem in seq:
+    ...     print(elem)
+
+Of course, if you want a fluent-style API for code composability, try using datapad's native Sequence manipulation APIs below.
+
 
 Slicing
 -------
 
-Sometimes you might not want to evaluate an entire sequence. For example, you might only want to evaluate the first element of a sequence. You can do so by calling the `first` function::
+Sometimes you might not want to evaluate an entire sequence. For example, you might only want to evaluate the first element of a sequence. You can do so by calling the :func:`~datapad.Sequence.first` function::
 
     >>> seq = dp.Sequence(range(10))
-    >>> seq.first()
-    0
+    >>> seq.first() 0
 
-Note, multiple calls to the `first` function will advance the Sequence iterator::
+Note, multiple calls to the :func:`~datapad.Sequence.first` function will advance the Sequence iterator::
 
     >>> seq = dp.Sequence(range(10))
     >>> seq.first()
@@ -49,35 +63,28 @@ Note, multiple calls to the `first` function will advance the Sequence iterator:
     >>> seq.first()
     2
 
-If you want to examine more than just the first element, you can call the `take` function with a integer representing the number of items you want to evaluate from your Sequence::
+
+If you want to examine more than just the first element, you can call the :func:`~datapad.Sequence.take` function with a integer representing the number of items you want to evaluate from your Sequence::
 
     >>> seq = dp.Sequence(range(10))
     >>> seq.take(4).collect()
     [0, 1, 2, 3]
 
-Counting
---------
-
-You can count the number of elements with the `count` method::
+Alternatively, if you want to take a look at a sequence without advancing its underlying iterator you can use the :func:`~datapad.Sequence.peek` method::
 
     >>> seq = dp.Sequence(range(10))
-    >>> seq.count()
-    10
-
-Or you can count occurences of all distinct elements in your sequence::
-
-    >>> seq = dp.Sequence(['a', 'a', 'b', 'b', 'b', 'c'])
-    >>> seq.count(distinct=True).collect()
-    [('a', 2), ('b', 3), ('c', 1)]
+    >>> seq.peek()
+    0
+    >>> seq.peek(4)
+    [0, 1, 2, 3]
+    >>> seq.peek(4)
+    [0, 1, 2, 3]
 
 
-Manipulating sequences
-======================
-
-In addition to examining the data in a `Sequence` object, `Datapad` provides a variety of methods to transform the data in your sequence.
-
-Transforming elements
+Mapping over sequence
 ---------------------
+
+The :class:`~datapad.Sequence` object in Datapad provides a variety of methods to transform the data in your sequence.
 
 You can use the :func:`~datapad.Sequence.map` method to apply a function to every element in your sequence::
 
@@ -86,13 +93,41 @@ You can use the :func:`~datapad.Sequence.map` method to apply a function to ever
     >>> seq.collect()
     [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]
 
-By default, most methods of the `Sequence` class returns a new sequence, enabling you to chain multiple `map` calls together in order to process your data in multiple steps:
+By default, most methods of the `Sequence` class returns a new sequence, enabling you to chain multiple :func:`~datapad.Sequence.map` calls together in order to process your data in multiple steps:
 
     >>> seq = dp.Sequence(range(3))
     >>> seq = seq.map(lambda elem: elem * 2)\
     ...          .map(lambda elem: (elem, elem))\
     ...          .collect()
     [(0, 0), (2, 2), (4, 4)]
+
+
+Parallelized mapping
+--------------------
+
+If you have a IO or compute intensive map function, you can use :func:`~datapad.Sequence.pmap` to run your function in parallel using multiple worker threads or cpu processes::
+
+    >>> def fetch_title(url):
+    ...    import re
+    ...    from urllib import request
+    ...    contents = request.urlopen(url).read().decode("utf-8")
+    ...    match = re.search('<title>(.*?)</title>', contents).groups()[0]
+    ...    return match
+
+    >>> urls = ["https://en.wikipedia.org/wiki/Vietnam",
+    ...         "https://en.wikipedia.org/wiki/Da_Lat",
+    ...         "https://en.wikipedia.org/wiki/Novak_Djokovic"]
+
+    >>> seq = dp.Sequence(urls)
+    >>> seq = seq.pmap(fetch_title, workers=2)
+    >>> seq.collect()
+    ['Vietnam - Wikipedia', 'Da Lat - Wikipedia', 'Novak Djokovic - Wikipedia']
+
+In the code above, the function fetch\_title will run in two separate worker threads in parallel, pull down wikipedia content and parse out its title.
+
+You can even get a progress bar for the above code by calling the :func:`~datapad.Sequence.progress` function before calling :func:`~datapad.Sequence.collect`::
+
+    >>> seq.progress().collect()
 
 Filtering elements
 ------------------
@@ -103,6 +138,60 @@ You can filter unwanted items from a sequence using the :func:`~datapad.Sequence
     >>> seq = seq.filter(lambda elem: elem > 6)
     >>> seq.collect()
     [7, 8, 9]
+
+You can use :func:`~datapad.Sequence.drop_if` to drop any sequence elements that match a given criteria::
+
+    >>> seq = dp.Sequence(range(10))
+    >>> seq.drop_if(lambda v: (v % 2) == 0).collect()
+    [1, 3, 5, 7, 9]
+
+
+Piping sequences
+----------------
+
+You can pipe your sequence to other functions for iterative processing using :func:`~datapad.Sequence.pipe`. These functions must take in a :class:`~datapad.Sequence` or Iterable as its first argument, and return another Sequence or iterable as its return value. We refer to these kinds of funcitons as "Pipes".
+
+
+Similar to the concept of pipes on a unix command-line, piping allows you to seamlessly compose your :class:`~datapad.Sequence` code with pre-existing iteration functions. ::
+
+    >>> def print_pipe(seq):
+    ...     for elem in seq:
+    ...         print("element: %d" % elem)
+    ...         yield elem
+
+    >>> dp.Sequence(range(5)).pipe(print_pipe).map(lambda v: v*2).collect()
+    element: 0
+    element: 1
+    element: 2
+    element: 3
+    element: 4
+    [0, 2, 4, 6, 8]
+
+It can also be a useful tool to abstract out complicated sequence processing pipelines::
+
+    >>> def my_pipe(seq):
+    ...     seq = seq.drop_if(lambda v: v > 5)\
+    ...              .map(lambda v: v*2)
+    ...     return seq
+
+    >>> seq = dp.Sequence(range(100))
+    >>> seq.pipe(my_pipe).collect()
+    [0, 2, 4, 6, 8, 10]
+
+Counting
+--------
+
+You can count the number of elements with the :func:`~datapad.Sequence.count` method::
+
+    >>> seq = dp.Sequence(range(10))
+    >>> seq.count()
+    10
+
+Or you can count occurences of all distinct elements in your sequence::
+
+    >>> seq = dp.Sequence(['a', 'a', 'b', 'b', 'b', 'c'])
+    >>> seq.count(distinct=True).collect()
+    [('a', 2), ('b', 3), ('c', 1)]
 
 Sorting elements
 ----------------

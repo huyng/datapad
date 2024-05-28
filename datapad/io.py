@@ -15,7 +15,7 @@
 """
 Convenience functions for creating Sequences from files and other input sources.
 """
-
+from typing import Callable, Iterable, Union, List
 from .sequence import Sequence
 
 
@@ -125,12 +125,12 @@ def read_json(path_or_paths, lines=True, ignore_errors=False):
     return seq
 
 
-def read_csv(path_or_paths):
+def read_csv(path_or_paths: Union[str, List[str]]):
     """
     Construct a Sequence from json text files
 
     Args:
-        path_or_paths: str or list of strings
+        path_or_paths (str | List[str]):
             A path, or list of paths. Paths may
             contain glob patterns like "data/metadata-*-a.txt"
 

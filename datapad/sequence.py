@@ -14,6 +14,7 @@
 
 from typing import Callable, Iterable, Union
 import collections
+from collections.abc import Iterator
 import itertools as it
 
 
@@ -23,17 +24,15 @@ class Sequence:
     data types in a fluent-style API.
     """
 
-    def __init__(self, _iterable: Union[Iterable, None] = None):
+    def __init__(self, iterable: Union[Iterable, None] = None):
         """
         Instantiates a new Sequence object.
 
         Args:
-            _iterable (List, Set, Tuple, Iterator):
+            iterable (List, Set, Tuple, Iterator):
                 Any object that conforms to the Iterable API.
         """
-        from collections.abc import Iterator
-
-        _iterable = iter([]) if _iterable is None else _iterable
+        _iterable = iter([]) if iterable is None else iterable
 
         # convert all iterables to iterator
         if not isinstance(_iterable, Iterator):
@@ -60,7 +59,7 @@ class Sequence:
             for item in seq:
                 yield fn(item)
 
-        seq = Sequence(_iterable=_map(self._iterable))
+        seq = Sequence(iterable=_map(self._iterable))
         return seq
 
     def join(self, other, key=None, other_key=None):
@@ -124,8 +123,8 @@ class Sequence:
                     v_b = b_index[k]
                     yield (v_a, v_b)
 
-        seq = Sequence(_iterable=_inner_join_iterator(self, other, key,
-                                                      other_key))
+        seq = Sequence(iterable=_inner_join_iterator(self, other, key,
+                                                     other_key))
         return seq
 
     def reduce(self, fn, initial=None):
@@ -231,7 +230,7 @@ class Sequence:
             raise Exception(
                 "Internal cache has never been created for this Sequence")
 
-        self._iterable = Sequence(_iterable=self._cache)
+        self._iterable = Sequence(iterable=self._cache)
         return self
 
     def pmap(self, fn, workers=3, ordered=True, wtype="thread"):
@@ -289,7 +288,7 @@ class Sequence:
                 for result in apply(fn, seq):
                     yield result
 
-        seq = Sequence(_iterable=_pmap(self._iterable, fn))
+        seq = Sequence(iterable=_pmap(self._iterable, fn))
         return seq
 
     def flatmap(self, fn):
@@ -316,7 +315,7 @@ class Sequence:
                 for element in fn(item):
                     yield element
 
-        seq = Sequence(_iterable=_flatmap(self._iterable))
+        seq = Sequence(iterable=_flatmap(self._iterable))
         return seq
 
     def filter(self, fn):
@@ -353,7 +352,7 @@ class Sequence:
                     continue
                 yield item
 
-        seq = Sequence(_iterable=_keep_if(self._iterable))
+        seq = Sequence(iterable=_keep_if(self._iterable))
         return seq
 
     def drop_if(self, fn):
@@ -403,7 +402,7 @@ class Sequence:
             counter = collections.Counter()
             for index, item in enumerate(self._iterable):
                 counter[item] += 1
-            return Sequence(_iterable=counter.items())
+            return Sequence(iterable=counter.items())
         return self.reduce(lambda acc, _: acc + 1, initial=0)
 
     def distinct(self):
@@ -415,7 +414,7 @@ class Sequence:
         ['a', 'b', 'c']
         """
         odict = collections.OrderedDict.fromkeys(list(self))
-        return Sequence(_iterable=odict.keys())
+        return Sequence(iterable=odict.keys())
 
     def zip_with_index(self):
         """
@@ -425,7 +424,7 @@ class Sequence:
         >>> seq.zip_with_index().collect()
         [(0, 'a'), (1, 'b'), (2, 'c')]
         """
-        seq = Sequence(_iterable=enumerate(self._iterable))
+        seq = Sequence(iterable=enumerate(self._iterable))
         return seq
 
     def drop(self, count):
@@ -446,7 +445,7 @@ class Sequence:
                 if i >= count:
                     yield item
 
-        seq = Sequence(_iterable=_drop(self._iterable))
+        seq = Sequence(iterable=_drop(self._iterable))
         return seq
 
     def take(self, count):
@@ -464,7 +463,7 @@ class Sequence:
                 if (i + 1) >= count:
                     break
 
-        seq = Sequence(_iterable=_take(self._iterable))
+        seq = Sequence(iterable=_take(self._iterable))
         return seq
 
     def first(self):
@@ -545,7 +544,7 @@ class Sequence:
         else:
             a = self._iterable
             b = seq._iterable
-        seq = Sequence(_iterable=it.chain(a, b))
+        seq = Sequence(iterable=it.chain(a, b))
         return seq
 
     def all(self):
@@ -605,7 +604,7 @@ class Sequence:
         """
 
         arr = sorted(self, key=key, reverse=reverse)
-        seq = Sequence(_iterable=arr)
+        seq = Sequence(iterable=arr)
         return seq
 
     def groupby(self, key=None, getter=None, eager_group=True):
@@ -667,14 +666,14 @@ class Sequence:
 
             for key, group in groups:
                 group = (getter(element) for element in group)
-                group_seq = Sequence(_iterable=group)
+                group_seq = Sequence(iterable=group)
 
                 if eager_group:
                     group_seq = group_seq.collect()
 
                 yield key, group_seq
 
-        seq = Sequence(_iterable=_f(self._iterable, key, getter))
+        seq = Sequence(iterable=_f(self._iterable, key, getter))
         return seq
 
     def shuffle(self):
@@ -696,7 +695,7 @@ class Sequence:
             random.shuffle(items)
             return items
 
-        seq = Sequence(_iterable=_shuffle(self._iterable))
+        seq = Sequence(iterable=_shuffle(self._iterable))
         return seq
 
     def window(self, size, stride=1):
@@ -761,7 +760,7 @@ class Sequence:
                 if windows % stride == 0:
                     yield list(queue)
 
-        seq = Sequence(_iterable=_window_iterator(
+        seq = Sequence(iterable=_window_iterator(
             self._iterable, size=size, stride=stride))
         return seq
 
@@ -860,7 +859,7 @@ class Sequence:
                   (time.time()-t0, i),
                   file=sys.stderr)
 
-        seq = Sequence(_iterable=_report(self._iterable))
+        seq = Sequence(iterable=_report(self._iterable))
         return seq
 
     def pipe(self,
@@ -901,7 +900,7 @@ class Sequence:
         if isinstance(r, Sequence):
             return r
         elif isinstance(r, Iterable):
-            return Sequence(_iterable=r)
+            return Sequence(iterable=r)
         else:
             raise TypeError("pipe must return Sequence or Iterable")
 
